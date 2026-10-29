@@ -86,6 +86,9 @@ the GUI cases when Qt is intentionally absent from a core-only installation.
 ## Dependencies
 
 The desktop uses the minimal official `PySide6-Essentials` wheel; Qt is not required by the
-headless core. Scrip's source license remains MIT. Qt/PySide carries separate upstream
+headless core. Linux also needs Qt's system runtime libraries; CI and the development
+container install `libegl1` for offscreen Qt imports. Graphical Linux environments may need
+additional [Qt platform dependencies](https://doc.qt.io/qt-6/linux-requirements.html).
+Scrip's source license remains MIT. Qt/PySide carries separate upstream
 license terms; see the [package metadata](https://pypi.org/project/PySide6-Essentials/).
 Review dependency notices when preparing an installer or redistributing bundled libraries.
