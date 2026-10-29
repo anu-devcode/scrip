@@ -3,6 +3,7 @@
 import argparse
 import json
 import sys
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Any
 
@@ -124,3 +125,14 @@ def adapter(args: argparse.Namespace) -> None:
         if args.action == "capabilities"
         else host.hook_configuration(settings_for(args).data_dir, args.mode)
     )
+
+
+def desktop(args: argparse.Namespace) -> None:
+    if find_spec("PySide6") is None:
+        raise ValueError(
+            "Desktop requires Python 3.12–3.15 and the desktop extra: "
+            "uv sync --locked --extra desktop"
+        )
+    from .desktop.app import run
+
+    raise SystemExit(run(settings_for(args).data_dir, demo=args.demo))

@@ -187,3 +187,38 @@ def test_failure_creates_one_generic_alert_without_question_content(companion, i
     assert failures[0].title == "An agent reported a failure"
     assert companion.sessions()[0].state == "idle"
     assert companion.inbox() == []
+
+
+def test_request_details_are_not_limited_by_recent_history(companion, input_event):
+    result = companion.ingest(input_event)
+    for index in range(105):
+        companion.ingest(
+            SessionEvent(
+                event_id=f"progress-{index}",
+                adapter=input_event.adapter,
+                session_id=input_event.session_id,
+                workspace=input_event.workspace,
+                kind="session.progress",
+            )
+        )
+    details = companion.request_details(result.request_id)
+    assert details.event == input_event
+    assert details.request.id == result.request_id
+    assert len(companion.history(100)) == 100
+
+
+def test_request_details_disappear_after_expiry_or_local_dismissal(companion, clock, input_event):
+    result = companion.ingest(input_event)
+    assert companion.request_details("unknown") is None
+    assert companion.acknowledge(result.request_id)
+    assert companion.request_details(result.request_id) is None
+    second = companion.ingest(
+        input_event.model_copy(
+            update={
+                "event_id": "next-question",
+                "operation_id": "next-operation",
+            }
+        )
+    )
+    clock.advance(minutes=16)
+    assert companion.request_details(second.request_id) is None

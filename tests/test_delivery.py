@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from threading import Lock
 
+from scrip_core.errors import DeliveryDeferred
 from scrip_core.notifications import ConsoleSink
 
 
@@ -109,3 +110,38 @@ def test_acknowledgement_during_delivery_cannot_revive_dismissed_item(companion,
     )
     assert companion.notifications()[0].state == "dismissed"
     assert companion.inbox() == []
+
+
+def test_deferring_a_batch_releases_all_unattempted_leases(companion, input_event):
+    for index in range(3):
+        companion.ingest(
+            input_event.model_copy(
+                update={
+                    "event_id": f"deferred-{index}",
+                    "operation_id": f"deferred-op-{index}",
+                }
+            )
+        )
+    attempted = []
+
+    def unavailable(message):
+        attempted.append(message)
+        raise DeliveryDeferred()
+
+    report = companion.deliver_notifications(ConsoleSink(unavailable))
+    assert report.deferred == 3
+    assert report.delivered == report.failed == 0
+    assert len(attempted) == 1
+    assert all(item.state == "queued" for item in companion.notifications())
+    assert companion.deliver_notifications(ConsoleSink(lambda _: None)).delivered == 3
+
+
+def test_deferral_does_not_revive_a_dismissed_notification(companion, input_event):
+    request = companion.ingest(input_event)
+
+    def closing(_message):
+        companion.acknowledge(request.request_id)
+        raise DeliveryDeferred()
+
+    assert companion.deliver_notifications(ConsoleSink(closing)).deferred == 1
+    assert companion.notifications()[0].state == "dismissed"

@@ -1,6 +1,7 @@
 """SQL queries and row validation; business decisions belong in CompanionService."""
 
 import hashlib
+import json
 import sqlite3
 from datetime import datetime, timedelta
 
@@ -8,7 +9,14 @@ from ..errors import ConflictError
 from ..limits import MAX_QUERY_ITEMS
 from ..models import EVENT, Event, IngestResult, InputRequested, Rule, SessionEvent, ToolRequested
 from ..ports import SessionKey
-from ..records import CoreStatus, HistoryEntry, NotificationRecord, RequestRecord, SessionRecord
+from ..records import (
+    CoreStatus,
+    HistoryEntry,
+    NotificationRecord,
+    RequestDetails,
+    RequestRecord,
+    SessionRecord,
+)
 
 NOTIFICATION_COLUMNS = "id,event_id,kind,title,state,created_at,delivered_at,attempts,last_error"
 
@@ -191,6 +199,18 @@ class SqliteRepository:
         self.refresh_session((row["adapter"], row["session_id"]))
         return True
 
+    def request_details(self, request_id: str) -> RequestDetails | None:
+        row = self.connection.execute(
+            """SELECT r.*,e.document FROM requests r JOIN events e ON e.id=r.event_id
+            WHERE r.id=? AND r.status='pending'""",
+            (request_id,),
+        ).fetchone()
+        if row is None:
+            return None
+        request = dict(row)
+        event = json.loads(request.pop("document"))
+        return RequestDetails.model_validate({"request": request, "event": event})
+
     def sessions(self) -> list[SessionRecord]:
         return [
             SessionRecord.model_validate(dict(row))
@@ -302,4 +322,11 @@ class SqliteRepository:
                 notification_id,
                 token,
             ),
+        )
+
+    def release_notification(self, notification_id: str, token: str) -> None:
+        self.connection.execute(
+            """UPDATE notifications SET state='queued',delivery_token=NULL,lease_until=NULL
+            WHERE id=? AND state='delivering' AND delivery_token=?""",
+            (notification_id, token),
         )

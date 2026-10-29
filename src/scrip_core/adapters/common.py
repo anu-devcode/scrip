@@ -30,7 +30,7 @@ class AdapterCapabilities(Contract):
     tool_events: bool = True
     policy_decisions: bool = True
     structured_questions: bool = True
-    notification_delivery: str = "durable-outbox-and-console"
+    notification_delivery: str = "durable-outbox; console or optional Qt desktop consumer"
     answer_forwarding: bool = False
     session_resume: bool = False
     plain_text_question_detection: bool = False

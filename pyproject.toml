@@ -26,6 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "httpx2>=2.16,<3", "ruff>=0.9,<1", "mypy>=1.13,<3"]
+desktop = ["pyside6-essentials>=6.8,<7; python_version < '3.16'"]
 
 [project.scripts]
 scrip = "scrip_core.cli:main"

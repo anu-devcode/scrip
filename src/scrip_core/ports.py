@@ -6,7 +6,14 @@ from datetime import datetime, timedelta
 from typing import Protocol
 
 from .models import Event, IngestResult, InputRequested, Rule, ToolRequested
-from .records import CoreStatus, HistoryEntry, NotificationRecord, RequestRecord, SessionRecord
+from .records import (
+    CoreStatus,
+    HistoryEntry,
+    NotificationRecord,
+    RequestDetails,
+    RequestRecord,
+    SessionRecord,
+)
 
 Clock = Callable[[], datetime]
 SessionKey = tuple[str, str]
@@ -33,6 +40,7 @@ class Repository(Protocol):
     def close_requests(self, key: SessionKey) -> None: ...
     def notify(self, event_id: str, kind: str, title: str, now: datetime) -> None: ...
     def inbox(self) -> list[RequestRecord]: ...
+    def request_details(self, request_id: str) -> RequestDetails | None: ...
     def acknowledge(self, request_id: str) -> bool: ...
     def sessions(self) -> list[SessionRecord]: ...
     def history(self, limit: int) -> list[HistoryEntry]: ...
@@ -48,6 +56,7 @@ class Repository(Protocol):
     def finish_notification(
         self, notification_id: str, token: str, now: datetime, error: str | None
     ) -> None: ...
+    def release_notification(self, notification_id: str, token: str) -> None: ...
 
 
 class UnitOfWork(Protocol):

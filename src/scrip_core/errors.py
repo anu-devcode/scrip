@@ -7,3 +7,7 @@ class ConflictError(ValueError):
 
 class StorageError(RuntimeError):
     """Local persistence is unavailable; no policy decision can safely be issued."""
+
+
+class DeliveryDeferred(Exception):
+    """The sink cannot accept an alert now; release its lease for another attempt."""

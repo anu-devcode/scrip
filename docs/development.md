@@ -17,10 +17,14 @@ Linux, and macOS and builds the Python distributions. The workflow does not publ
 For another remote development environment, clone the repository and follow the same setup
 commands. Scrip does not depend on Codespaces.
 
+Codespaces can run the desktop's offscreen tests and render a preview. The interactive
+desktop requires a graphical session; this repository does not provide a browser-based
+remote desktop or a connector to agents on another machine. See [desktop setup](desktop.md).
+
 ## Install and verify
 
 ```sh
-uv sync --locked --extra dev
+uv sync --locked --extra dev --extra desktop
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .

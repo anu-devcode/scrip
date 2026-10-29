@@ -13,10 +13,14 @@ Keep policy and event orchestration independent of SQLite, HTTP, and host-specif
 Share mechanics between adapters; keep native permission semantics explicit. Avoid speculative
 frameworks, compatibility aliases, and abstraction layers without an actual use case.
 
-Development: `uv sync --locked --extra dev`; `uv run pytest`; `uv run ruff check .`;
+Development: `uv sync --locked --extra dev --extra desktop`; `uv run pytest`; `uv run ruff check .`;
 `uv run ruff format --check .`; `uv run mypy src`. Run `uv run python -m devtools.demo`
 for an isolated demo. It must not execute proposed tool commands or modify any IDE.
 
 Keep contracts/event-v1.schema.json synchronized with the runtime schema. Test new permission,
 isolation, replay, transaction, or delivery behavior with meaningful regression cases.
 Do not claim unlimited scale, universal host compatibility, or launch readiness from these tests.
+
+Desktop code uses the optional PySide6 Essentials dependency. Keep database operations off
+the GUI thread, render host text as plain text, and submit tray alerts only on the GUI thread.
+Offscreen widget tests must never display native alerts or alter a host's settings.
