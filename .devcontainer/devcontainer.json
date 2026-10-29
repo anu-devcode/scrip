@@ -1,6 +1,8 @@
 {
   "name": "Scrip development",
-  "image": "mcr.microsoft.com/devcontainers/python:3.13-bookworm",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "remoteUser": "vscode",
-  "postCreateCommand": "pipx install --force uv==0.13.6 && uv sync --locked --extra dev"
+  "postCreateCommand": "pipx install --force uv==0.13.6 && uv sync --locked --extra dev --extra desktop"
 }

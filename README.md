@@ -4,15 +4,16 @@ A local Python companion for coding agents: explicit permission policies, a shar
 inbox, session history, and durable notification records.
 
 **Status: development alpha.** The core and two hook adapters are covered by protocol and
-local process tests. Live host integration, desktop notifications, installers, and release
-certification remain future work. Compatibility depends on the host's documented interfaces.
+local process tests. An optional desktop inbox and Qt tray-alert consumer are implemented.
+Live host integration, native alert certification, installers, and release certification
+remain future work. Compatibility depends on the host's documented interfaces.
 
 ## Try it locally
 
 Requires Python 3.12 or newer and `uv`. From this repository:
 
 ```sh
-uv sync --locked --extra dev
+uv sync --locked --extra dev --extra desktop
 uv run python -m devtools.demo
 ```
 
@@ -36,8 +37,21 @@ See the [remote setup guide](docs/development.md#remote-development).
 - Loopback HTTP service with bearer authentication, bounded request bodies, and typed responses.
 
 Questions require an answer in the originating agent. Local acknowledgement only dismisses
-the inbox item. Notifications currently have a console consumer; native desktop alerts are
-not implemented. Scrip's hook decision is advisory to the host, not an execution sandbox.
+the inbox item. Notifications have console and optional desktop consumers. Scrip's hook
+decision is advisory to the host, not an execution sandbox.
+
+## Desktop preview
+
+On a machine with a graphical session, try the inbox with temporary fictional requests:
+
+```sh
+uv run --extra desktop scrip desktop --demo
+```
+
+The desktop offers full request details, local dismissal, pause/resume, recent sessions, and
+tray alerts where the desktop environment supports them. It performs database work on a
+background thread and never executes proposed tools or answers questions. See the
+[desktop guide](docs/desktop.md) for real-state setup and notification limits.
 
 ## Repository
 
@@ -48,6 +62,7 @@ src/scrip_core/
   records.py              typed application results
   storage/                SQLite transactions, migrations, and queries
   adapters/               shared mechanics and explicit host protocols
+  desktop/                optional Qt inbox, worker, and tray consumer
   api.py, client.py        local HTTP transport
   cli.py, commands.py      command parsing and handlers
 contracts/                exported event schema

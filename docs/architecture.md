@@ -13,11 +13,13 @@ flowchart LR
     Client --> API[HTTP transport]
     API --> Service[CompanionService]
     CLI[Local management commands] --> Service
+    Desktop[Optional Qt inbox worker] --> Service
     Service --> Policy[Pure policy decisions]
     Service --> Ports[Transaction and repository protocols]
     SQLite[SQLite implementation] -. implements .-> Ports
     Service --> Sink[Notification sink protocol]
     Console[Console consumer] -. implements .-> Sink
+    Tray[Qt GUI-thread tray consumer] -. implements .-> Sink
 ```
 
 `models.py` and `policy.py` contain the event contract and deterministic permission logic.
@@ -78,7 +80,28 @@ Delivery is **at least once**: a crash after sending but before committing, or a
 outliving its lease, can produce a duplicate. Sinks should deduplicate by notification ID.
 An already in-flight alert may still arrive after dismissal. Failed sends store only the
 exception type and become terminal `failed` records; automatic retry/backoff is not yet
-implemented. The console consumer is the only delivery implementation today.
+implemented. A sink can explicitly defer delivery; its current and remaining batch leases
+are returned to the queue without reviving dismissed records. Console and Qt tray consumers
+use the same delivery protocol.
+
+## Desktop boundary
+
+The optional `desktop/` package composes the existing application service with a Qt window.
+The CLI imports Qt only for `scrip desktop`; the headless core has no Qt dependency. A single
+worker thread performs database reads, acknowledgement, and pause changes. The GUI renders
+typed snapshots and plain text request details. Full pending-request lookup is independent
+of the bounded history view. Stale detail results cannot replace a newer selected request.
+
+The tray sink hands a notification to the GUI thread and waits for bounded acceptance before
+the outbox is marked delivered. Cancellation, a missing tray, or a timed-out handoff defers
+the alert. A cancelled ticket cannot later display from the GUI queue. The desktop claims
+one alert per two-second refresh to avoid large bursts and outstanding batch leases. OS
+display and user reading are not acknowledged by Qt's tray API.
+
+The window closes to the tray when one is available; explicit Quit cancels pending handoffs,
+stops the worker, and exits. With no tray, closing the window exits. The desktop reads the
+same local database as the service; it does not use an exposed management API, launch a host,
+start the HTTP service, or bridge to another machine. See [desktop guide](desktop.md).
 
 SQLite remains a single-writer local store. There is no claim of unlimited scale, load-tested
 throughput, multi-user tenancy, retention management, or remote coordination. Benchmark event

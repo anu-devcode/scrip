@@ -7,7 +7,7 @@ permission, adapter, or persistence behavior.
 ## Setup
 
 ```sh
-uv sync --locked --extra dev
+uv sync --locked --extra dev --extra desktop
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .
@@ -28,7 +28,7 @@ uv build
 - Update the event schema with intentional contract changes. Add forward-only atomic schema
   migrations; never change the meaning of an already-released migration.
 - Keep dependency changes in `pyproject.toml` and commit the updated `uv.lock`. Run
-  `uv sync --locked --extra dev` before verification.
+  `uv sync --locked --extra dev --extra desktop` before verification.
 - Document actual capability limits. Fixture tests do not establish live host compatibility,
   multi-platform support, security certification, or production scale.
 

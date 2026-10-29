@@ -10,7 +10,9 @@ pricing, retention, and time savings remain unvalidated.
 The repository contains one Python product: typed events, deterministic policy decisions,
 application orchestration separated from storage/HTTP, SQLite migrations and durable state,
 an authenticated local service, CLI, and two documented-hook adapters. Adapter protocol and
-local process tests exist; live host certification and desktop notifications do not.
+local process tests exist. An optional Qt desktop inbox, background worker, and tray consumer
+are implemented with offscreen regression tests. Live host and native OS alert certification
+remain outstanding.
 
 The old JavaScript extension, patch plans, and vendor-patching source have been removed.
 Installed IDEs are outside repository maintenance. The product uses documented host interfaces
@@ -25,10 +27,10 @@ Run instructions live in [development](docs/development.md).
    regression tests, atomic migrations, clear capability limits, reproducible builds, and
    contributor documentation. Establish performance baselines and data-retention requirements
    before making scale claims.
-2. **Build the desktop experience.** Prototype a tray client, native notification sink, and
-   inbox. Open the originating host for answers where supported; do not imply local
-   acknowledgement answers the agent. Design delivery retries, deduplication, retention,
-   and diagnostics around real failures before broader deployment.
+2. **Validate the desktop experience.** The first Qt tray client, notification sink, and inbox
+   exist. Validate OS notification behavior, shutdown, accessibility, and packaging in real
+   graphical sessions. Add host navigation only through verified interfaces. Design delivery
+   retries, deduplication, retention, and diagnostics around real failures before broader use.
 3. **Certify live integrations.** Use separate disposable host test environments, with explicit
    versions and platforms. Verify native allow/ask/deny behavior, questions, retries, timeouts,
    workspace routing, session lifecycle, and clean configuration removal. Leave active user
@@ -54,6 +56,6 @@ model, app, or remote-workspace compatibility claim is justified by this core.
 
 ## Next product deliverable
 
-A desktop notification/inbox proof of concept, followed by live adapter certification in
-isolated environments. Select the desktop toolkit after testing notification, tray, packaging,
-and accessibility requirements. Keep the core usable through the CLI and local API.
+Validate the desktop inbox and OS alerts in isolated graphical test environments, then
+certify live adapter behavior. Next engineering work includes delivery diagnostics/retry and
+retention controls before packaging. Keep the core usable through the CLI and local API.

@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from .errors import ConflictError
+from .errors import ConflictError, DeliveryDeferred
 from .limits import MAX_QUERY_ITEMS
 from .models import (
     Decision,
@@ -23,6 +23,7 @@ from .records import (
     DeliveryReport,
     HistoryEntry,
     NotificationRecord,
+    RequestDetails,
     RequestRecord,
     SessionRecord,
 )
@@ -134,6 +135,11 @@ class CompanionService:
             repository.expire(self.clock())
             return repository.acknowledge(request_id)
 
+    def request_details(self, request_id: str) -> RequestDetails | None:
+        with self.uow.transaction() as repository:
+            repository.expire(self.clock())
+            return repository.request_details(request_id)
+
     def sessions(self) -> list[SessionRecord]:
         with self.uow.transaction() as repository:
             repository.expire(self.clock())
@@ -179,11 +185,20 @@ class CompanionService:
                 max(1, min(limit, MAX_QUERY_ITEMS)),
             )
         delivered = failed = 0
-        for notification in pending:
+        for index, notification in enumerate(pending):
             error = None
             try:
                 sink.send(notification)  # External I/O must not hold a database transaction.
                 delivered += 1
+            except DeliveryDeferred:
+                with self.uow.transaction() as repository:
+                    for remaining in pending[index:]:
+                        repository.release_notification(remaining.id, token)
+                return DeliveryReport(
+                    delivered=delivered,
+                    failed=failed,
+                    deferred=len(pending) - index,
+                )
             except Exception as exception:
                 error = type(exception).__name__
                 failed += 1
