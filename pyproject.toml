@@ -1,0 +1,84 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scrip-companion"
+dynamic = ["version"]
+description = "Local, model-independent companion core for coding agents."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+dependencies = [
+  "fastapi>=0.115,<1",
+  "pydantic>=2.9,<3",
+  "uvicorn>=0.30,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "httpx2>=2.16,<3", "ruff>=0.9,<1", "mypy>=1.13,<3"]
+
+[project.scripts]
+scrip = "scrip_core.cli:main"
+
+[project.urls]
+Repository = "https://github.com/anu-devcode/scrip"
+Issues = "https://github.com/anu-devcode/scrip/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scrip_core"]
+
+[tool.hatch.version]
+path = "src/scrip_core/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests",
+  "/devtools",
+  "/docs",
+  "/contracts",
+  "/.github",
+  "/.devcontainer",
+  "/.gitattributes",
+  "/.gitignore",
+  "/pyproject.toml",
+  "/uv.lock",
+  "/README.md",
+  "/LICENSE",
+  "/AGENTS.md",
+  "/PRODUCT_PLAN.md",
+  "/CONTRIBUTING.md",
+  "/SECURITY.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--strict-config --strict-markers"
+
+[tool.ruff]
+extend-exclude = [".uv-cache", ".uv-clean-cache"]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true

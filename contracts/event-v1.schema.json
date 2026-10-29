@@ -1,0 +1,464 @@
+{
+  "$defs": {
+    "Input": {
+      "additionalProperties": false,
+      "properties": {
+        "questions": {
+          "items": {
+            "$ref": "#/$defs/Question"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Questions",
+          "type": "array"
+        },
+        "source_tool": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Source Tool",
+          "type": "string"
+        },
+        "reply_supported": {
+          "const": false,
+          "default": false,
+          "title": "Reply Supported",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "questions",
+        "source_tool"
+      ],
+      "title": "Input",
+      "type": "object"
+    },
+    "InputRequested": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "event_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "adapter": {
+          "maxLength": 80,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Adapter",
+          "type": "string"
+        },
+        "session_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "workspace": {
+          "title": "Workspace",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "kind": {
+          "const": "input.requested",
+          "title": "Kind",
+          "type": "string"
+        },
+        "operation_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/Input"
+        }
+      },
+      "required": [
+        "event_id",
+        "adapter",
+        "session_id",
+        "workspace",
+        "kind",
+        "operation_id",
+        "payload"
+      ],
+      "title": "InputRequested",
+      "type": "object"
+    },
+    "JsonValue": {},
+    "Question": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Options",
+          "type": "array"
+        },
+        "multiple": {
+          "default": false,
+          "title": "Multiple",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "Question",
+      "type": "object"
+    },
+    "SessionEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "event_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "adapter": {
+          "maxLength": 80,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Adapter",
+          "type": "string"
+        },
+        "session_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "workspace": {
+          "title": "Workspace",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "session.started",
+            "session.completed",
+            "session.failed",
+            "session.progress",
+            "turn.completed",
+            "turn.failed"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/SessionInfo"
+        }
+      },
+      "required": [
+        "event_id",
+        "adapter",
+        "session_id",
+        "workspace",
+        "kind"
+      ],
+      "title": "SessionEvent",
+      "type": "object"
+    },
+    "SessionInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "model_name": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model Name"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        }
+      },
+      "title": "SessionInfo",
+      "type": "object"
+    },
+    "Tool": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Name",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Arguments",
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Tool",
+      "type": "object"
+    },
+    "ToolCompleted": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "event_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "adapter": {
+          "maxLength": 80,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Adapter",
+          "type": "string"
+        },
+        "session_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "workspace": {
+          "title": "Workspace",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "kind": {
+          "const": "tool.completed",
+          "title": "Kind",
+          "type": "string"
+        },
+        "operation_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/ToolResult"
+        }
+      },
+      "required": [
+        "event_id",
+        "adapter",
+        "session_id",
+        "workspace",
+        "kind",
+        "operation_id",
+        "payload"
+      ],
+      "title": "ToolCompleted",
+      "type": "object"
+    },
+    "ToolRequested": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "event_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "adapter": {
+          "maxLength": 80,
+          "minLength": 1,
+          "pattern": "^[a-z0-9_-]+$",
+          "title": "Adapter",
+          "type": "string"
+        },
+        "session_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Session Id",
+          "type": "string"
+        },
+        "workspace": {
+          "title": "Workspace",
+          "type": "string"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "kind": {
+          "const": "tool.requested",
+          "title": "Kind",
+          "type": "string"
+        },
+        "operation_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "policy_mode": {
+          "default": "enforce",
+          "enum": [
+            "observe",
+            "enforce"
+          ],
+          "title": "Policy Mode",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/Tool"
+        }
+      },
+      "required": [
+        "event_id",
+        "adapter",
+        "session_id",
+        "workspace",
+        "kind",
+        "operation_id",
+        "payload"
+      ],
+      "title": "ToolRequested",
+      "type": "object"
+    },
+    "ToolResult": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[^\\x00-\\x1f]+$",
+          "title": "Name",
+          "type": "string"
+        },
+        "arguments": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Arguments",
+          "type": "object"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ToolResult",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "input.requested": "#/$defs/InputRequested",
+      "session.completed": "#/$defs/SessionEvent",
+      "session.failed": "#/$defs/SessionEvent",
+      "session.progress": "#/$defs/SessionEvent",
+      "session.started": "#/$defs/SessionEvent",
+      "tool.completed": "#/$defs/ToolCompleted",
+      "tool.requested": "#/$defs/ToolRequested",
+      "turn.completed": "#/$defs/SessionEvent",
+      "turn.failed": "#/$defs/SessionEvent"
+    },
+    "propertyName": "kind"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ToolRequested"
+    },
+    {
+      "$ref": "#/$defs/ToolCompleted"
+    },
+    {
+      "$ref": "#/$defs/InputRequested"
+    },
+    {
+      "$ref": "#/$defs/SessionEvent"
+    }
+  ]
+}

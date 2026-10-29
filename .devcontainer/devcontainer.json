@@ -1,0 +1,6 @@
+{
+  "name": "Scrip development",
+  "image": "mcr.microsoft.com/devcontainers/python:3.13-bookworm",
+  "remoteUser": "vscode",
+  "postCreateCommand": "pipx install --force uv==0.13.6 && uv sync --locked --extra dev"
+}
