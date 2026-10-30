@@ -210,12 +210,48 @@ def test_refresh_can_retry_details_without_changing_selection(qapp, companion, i
     window.close()
 
 
-def test_desktop_demo_exits_cleanly_and_removes_its_temporary_state(tmp_path):
+def test_question_cannot_create_rule_and_stale_details_disable_rule(qapp, companion, input_event):
+    result = companion.ingest(input_event)
+    window = InboxWindow()
+    window.apply_snapshot(snapshot(companion))
+    window.show_details(result.request_id, companion.request_details(result.request_id))
+    assert not window.rule_button.isEnabled()
+    window.show_details(result.request_id, None)
+    assert not window.rule_button.isEnabled()
+    window.close()
+
+
+def test_rule_from_real_pending_tool_is_exact_expiring_and_revocable(qapp, companion, tool_event):
+    from datetime import timedelta
+
+    result = companion.ingest(tool_event)
+    sink = TraySink(FakeTray(available=False))
+    worker = DesktopWorker(companion, sink, threading.Event(), alerts=False)
+    plans = []
+    worker.rule_plan.connect(plans.append)
+    worker.plan_rule(result.request_id)
+    rule = plans[0]
+    assert rule.adapter == tool_event.adapter
+    assert rule.workspace == tool_event.workspace
+    assert rule.tool == tool_event.payload.name
+    assert rule.arguments == tool_event.payload.arguments
+    assert rule.action == "allow"
+    assert rule.expires_at - companion.clock() == timedelta(hours=24)
+    assert companion.rules() == []  # Review is separate from saving.
+    worker.save_rule(rule)
+    assert companion.rules() == [rule]
+    worker.remove_rule(rule.id)
+    assert companion.rules() == []
+    sink.close()
+
+
+def test_desktop_first_launch_exits_cleanly_with_no_seeded_data(tmp_path):
     script = """
 import sys
 from pathlib import Path
 from PySide6.QtCore import QTimer
 from scrip_core.desktop import app
+from scrip_core.bootstrap import create_service
 original_application = app.QApplication
 class TimedApplication(original_application):
     def exec(self):
@@ -223,22 +259,19 @@ class TimedApplication(original_application):
         return super().exec()
 app.QApplication = TimedApplication
 app.QSystemTrayIcon.isSystemTrayAvailable = lambda: False
-roots = []
-original_seed = app.seed_demo
-def seed(service, workspace):
-    roots.append(workspace)
-    original_seed(service, workspace)
-app.seed_demo = seed
-assert app.run(Path(sys.argv[1]), demo=True) == 0
-assert roots and not roots[0].exists()
+root = Path(sys.argv[1])
+assert app.run(root) == 0
+service = create_service(root / "scrip.sqlite3")
+assert service.status().events == 0
+assert service.sessions() == []
+assert service.inbox() == []
 """
     result = subprocess.run(
         [sys.executable, "-c", script, str(tmp_path)],
         env={**os.environ, "QT_QPA_PLATFORM": "offscreen"},
         capture_output=True,
         text=True,
-        timeout=20,
+        timeout=25,
     )
     assert result.returncode == 0, result.stderr
     assert "QThread: Destroyed" not in result.stderr
-    assert list(tmp_path.iterdir()) == []

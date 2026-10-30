@@ -1,96 +1,58 @@
 # Scrip
 
-A local Python companion for coding agents: explicit permission policies, a shared input
-inbox, session history, and durable notification records.
+Scrip is a local desktop companion for coding agents. It keeps structured questions,
+permission requests, sessions, and exact approval rules in one place.
 
-**Status: development alpha.** The core and two hook adapters are covered by protocol and
-local process tests. An optional desktop inbox and Qt tray-alert consumer are implemented.
-Live host integration, native alert certification, installers, and release certification
-remain future work. Compatibility depends on the host's documented interfaces.
+## Install
 
-## Try it locally
+Download the Windows x64 setup from **https://scrip.anwardev.me**. The installer includes
+Python and Qt, adds a Start menu shortcut, and opens a clean application. No terminal or
+Python environment is required. The current installer is unsigned.
 
-Requires Python 3.12 or newer and `uv`. From this repository:
+Open Connections, select a Claude Code workspace, review its settings, then connect.
+Restart the agent session. Activity appears only when actual hook events arrive.
+Scrip never seeds sessions or modifies IDE application files.
+
+## Current scope
+
+- Guided Claude Code workspace setup through documented hooks, with review and backups.
+- A local inbox, session visibility, and tray notifications where supported by the OS.
+- Exact scoped approval rules with a 24-hour expiry when created in the desktop.
+- Rule pause/revocation and explicit disconnection that preserves other host settings.
+- An authenticated loopback service managed automatically by the desktop.
+
+Questions and existing permission prompts are resolved in the originating agent. A saved
+rule applies to future exact matches only, in Rules mode. The host retains its own controls.
+Live host-version and native notification certification remain outstanding. Native macOS/Linux
+installers, other guided host connections, mobile, remote control, deployment automation,
+and token optimization are future work. Compatibility comes from host interfaces, not models.
+
+## Develop
 
 ```sh
 uv sync --locked --extra dev --extra desktop
-uv run python -m devtools.demo
-```
-
-The demo starts a temporary authenticated service, submits sample hook events, demonstrates
-an exact permission rule and replay protection, and records a question notification. It
-cleans up its own process and state. Proposed agent commands are never executed.
-
-For remote development, [open a GitHub Codespace](https://codespaces.new/anu-devcode/scrip)
-or clone [the repository](https://github.com/anu-devcode/scrip) into your development host.
-See the [remote setup guide](docs/development.md#remote-development).
-
-## What exists
-
-- Validated, versioned events and an exported [JSON Schema](contracts/event-v1.schema.json).
-- Deterministic rules scoped to an adapter, workspace, exact tool arguments, optional session,
-  and expiry. Deny takes precedence; unknown actions require host review in enforcing mode.
-- Transactional SQLite sessions, event history, pending requests, and notification outbox.
-- Separate event orchestration, storage, HTTP transport, CLI, and host adapters.
-- Antigravity and Claude Code hook adapters with explicit native permission responses.
-  Configuration generation prints JSON for review; it does not install host settings.
-- Loopback HTTP service with bearer authentication, bounded request bodies, and typed responses.
-
-Questions require an answer in the originating agent. Local acknowledgement only dismisses
-the inbox item. Notifications have console and optional desktop consumers. Scrip's hook
-decision is advisory to the host, not an execution sandbox.
-
-## Desktop preview
-
-On a machine with a graphical session, try the inbox with temporary fictional requests:
-
-```sh
-uv run --extra desktop scrip desktop --demo
-```
-
-The desktop offers full request details, local dismissal, pause/resume, recent sessions, and
-tray alerts where the desktop environment supports them. It performs database work on a
-background thread and never executes proposed tools or answers questions. See the
-[desktop guide](docs/desktop.md) for real-state setup and notification limits.
-
-## Repository
-
-```text
-src/scrip_core/
-  models.py, policy.py     event contracts and pure permission decisions
-  service.py, ports.py     orchestration and storage/delivery interfaces
-  records.py              typed application results
-  storage/                SQLite transactions, migrations, and queries
-  adapters/               shared mechanics and explicit host protocols
-  desktop/                optional Qt inbox, worker, and tray consumer
-  api.py, client.py        local HTTP transport
-  cli.py, commands.py      command parsing and handlers
-contracts/                exported event schema
-tests/                    regression and protocol tests
-devtools/                 shared process harness and isolated demo
-docs/                     architecture and development guides
-```
-
-One root `pyproject.toml` and `uv.lock` define the Python package. The obsolete JavaScript
-extension and vendor-patching tools have been removed from this repository. Existing local
-IDE installations are outside this project's maintenance scope.
-
-## Development
-
-```sh
+uv run scrip desktop
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy src
-uv build
 ```
 
-See the [development guide](docs/development.md), [architecture](docs/architecture.md),
-[product plan](PRODUCT_PLAN.md), [contribution guide](CONTRIBUTING.md), and
-[security notes](SECURITY.md). Licensed under [MIT](LICENSE).
+Normal desktop startup uses persistent local state and no fictional data. Tests use isolated
+fixtures. Never point tests at a real workspace or existing application state.
 
-For versioned developer-alpha packages, the public download site, and shared-VM hosting,
-see the [deployment guide](docs/deployment.md).
+## Structure
 
-The [Scrip brand kit](assets/brand/README.md) contains the editable robot symbol, custom
-wordmark, color/monochrome exports, app icons, and a 3D mascot reference.
+```text
+src/scrip_core/   domain, orchestration, adapters, transports, storage, desktop
+contracts/       synchronized event contract
+tests/           isolated regression and protocol cases
+devtools/        build, release, process-test, and screenshot tooling
+deploy/          Windows installer and Azure static publishing
+web/             public website and getting-started guide
+assets/brand/    brand source and exports
+```
+
+See [development](docs/development.md), [desktop](docs/desktop.md),
+[deployment](docs/deployment.md), [architecture](docs/architecture.md), and
+[security](SECURITY.md). The source is MIT licensed; bundled dependencies retain their licenses.

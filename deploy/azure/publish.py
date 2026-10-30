@@ -15,8 +15,8 @@ from pathlib import Path, PurePosixPath
 from uuid import uuid4
 
 ROOT_MARKER = ".scrip-public-distribution"
-MAX_ARCHIVE_BYTES = 32 * 1024 * 1024
-MAX_CONTENT_BYTES = 200 * 1024 * 1024
+MAX_ARCHIVE_BYTES = 512 * 1024 * 1024
+MAX_CONTENT_BYTES = 1024 * 1024 * 1024
 VERSION = r"[0-9]+\.[0-9]+\.[0-9]+(?:(?:a|b|rc)[0-9]+)?"
 RELEASE_ID = re.compile(rf"{VERSION}-[0-9a-f]{{12}}")
 

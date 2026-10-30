@@ -1,67 +1,65 @@
-# Early-alpha deployment
+# Deployment and desktop releases
 
-Scrip has two deployment surfaces: a public static product/download site, and a local
-application installed by a tester. The public site does not run the agent-control API.
-The source repository remains private; publishing the Python wheel distributes its
-application modules, not the complete private repository or any runtime state.
+The production hostname is **https://scrip.anwardev.me**. DNS A record `scrip` points to
+`4.222.233.58`, the existing Anbabi Azure VM. Resolve the hostname again before infrastructure
+changes: cloud IPs can change. Scrip's site is a separate static virtual host in the existing
+Caddy process. Private agent events stay on the user's computer, not on Azure.
 
-## First steps
+## User installation
 
-1. Use the temporary HTTPS preview to download the developer alpha and try the fictional
-   desktop demo. Begin with a fresh Python environment and an isolated workspace.
-2. Choose the exact Scrip domain/subdomain when ready. Point its DNS A record at the
-   existing VM's public IP. Keep Scrip on a separate hostname from Anbabi.
-3. Add the dedicated Caddy static-site block after confirming DNS and the existing Anbabi
-   configuration. The VM already has Caddy; do not install another public web server.
-4. Start with a few invited testers. Establish a monitored support/disclosure contact,
-   collect concrete failures, and certify live host/OS combinations before broad promotion.
+Download the Windows x64 setup file and run it. It includes Python and Qt, installs per user,
+and adds a Start menu shortcut. Opening Scrip initializes empty local state and starts its
+private authenticated loopback service. Connect a Claude Code project from Connections and
+restart the host session. No developer environment, manual service, sample data, or Scrip
+account is required. The installer is unsigned; publisher signing remains outstanding.
 
-No new Azure VM, database service, model API key, payment system, or mobile backend is needed
-for this alpha. This does not make the broader shipping/mobile/token roadmap implemented.
+## Build and release
 
-## Release process
+Version is defined in `src/scrip_core/__init__.py`. Update it, `uv.lock`, and
+`docs/releases/VERSION.md`, then merge a verified branch to main and push `vVERSION`.
+The Desktop release workflow reruns the Windows/Linux/macOS Python test matrix, builds and
+checks the Windows bundle on a Windows runner, compiles the per-user Inno Setup installer,
+builds Python distributions and a public static bundle, and publishes immutable release
+artifacts. Prerelease versions are marked as such; existing releases are never overwritten.
 
-Version is defined once in `src/scrip_core/__init__.py`. For an alpha:
+For a local Windows build:
 
-1. Update that version and add `docs/releases/VERSION.md`; update `uv.lock` with `uv sync`.
-2. Merge a verified change into `main`.
-3. Create/push a matching tag, such as `v0.1.0a1`.
-
-The **Developer alpha release** workflow reuses the full Windows/Linux/macOS CI matrix,
-builds the wheel/source distribution, renders a fictional-workspace screenshot, builds an
-allowlisted static site, and publishes a GitHub prerelease. Existing release artifacts are
-not overwritten. Use a new version for a changed release.
-
-Artifacts: wheel, source archive, `scrip-web-VERSION.tar.gz`, and `SHA256SUMS`. The public
-site contains the wheel, public guides, branding, release metadata, and checksums. It does
-not copy the repository tree, `.env`, SSH keys, API tokens, or application databases.
-GitHub release access follows repository visibility. Do not advertise a private GitHub
-download URL as a public download; the static site's wheel URL is the public distribution.
-
-For a local build (use a new output directory):
-
-```sh
-uv sync --locked --extra dev --extra desktop
+```powershell
+uv sync --locked --extra dev --extra desktop --extra build
+uv run python -m devtools.build_windows --compiler PATH_TO_ISCC.exe
 uv build
-uv run python -m devtools.desktop_preview
-uv run python -m devtools.release --output dist/release/public --commit FULL_COMMIT_SHA --screenshot dist/desktop-preview.png --tag v0.1.0a1
+uv run python -m devtools.capture_desktop
+uv run python -m devtools.release --output dist/release/public --commit FULL_COMMIT_SHA --screenshot dist/desktop.png --installer dist/installers/Scrip-VERSION-windows-x64-setup.exe --tag vVERSION
 ```
 
-`release.json` describes the exact wheel and source commit. `health.json` describes the
-public distribution site only. Checksums provide artifact-integrity checks, not a claim of
-signed provenance. Native installers and signed updates remain future work.
+Build requires Windows x64, Inno Setup, and the locked build extra. The pinned compiler
+installer is downloaded from its publisher and its Authenticode signature is checked in CI.
+This signature is for the compiler; it does not sign the Scrip installer. Build smoke checks
+run only in a temporary directory and never install host settings or seed the normal app.
 
-## Temporary hosted preview
+The release contains setup EXE, wheel, source archive, website archive, and `SHA256SUMS`.
+Only explicitly allowlisted website files, branding, a screenshot of the actual empty
+connection screen, wheel, installer, and release metadata are public. Tokens, databases,
+SSH keys, repository metadata, private files, and test fixtures are not copied. `release.json`
+records source commit, installer platform, signature status, artifact sizes, and hashes.
+Checksums verify integrity; they are not signed provenance.
 
-The preview uses the same public files as the Azure bundle. Its non-secret Site identity is
-recorded in `deploy/sites/hosting.json`. Provider credentials are not stored in the repository.
-Build/copy the verified public tree into the isolated, ignored `dist/hosted-site/dist`
-checkout, use the Sites source helper, then save/publish through the native Sites tools.
-Preserve the existing project ID and its intended public audience on subsequent updates.
+The repository remains private. The production site hosts downloads directly so people do
+not need GitHub access. The previous hosted developer-preview distribution is retired when
+the Azure site is verified. Its non-secret Site identity remains in `deploy/sites/hosting.json`
+for ownership records, not as a second user-facing install channel.
 
-The temporary host is for public product information/downloads. It does not receive local
-agent events or private Anbabi/Scrip state. A successful website deployment is not live host
-certification, an installed desktop app, or a mobile release.
+## Capacity and remaining release gates
+
+The audited VM has roughly 846 MiB RAM, 2 GiB swap, and 55 GiB free disk. Scrip adds static
+file serving to the existing Caddy process, not another always-on backend. No VM upgrade,
+new database, model API key, or payment service is required for this distribution design.
+Monitor actual memory, egress, disk use, and download traffic before choosing more capacity.
+
+Signing the Windows installer and future updates requires a publisher-signing identity.
+Live host-version and native OS-notification certification remain outstanding. The shipped
+installer targets Windows x64 and guided Claude Code setup; other hosts/platforms, mobile,
+remote control, shipping workflows, and token optimization are separate product work.
 
 ## Shared Azure VM
 
@@ -89,12 +87,12 @@ verifies all content, then atomically replaces `current`. Old releases remain av
 
 ### Add the hostname once DNS is ready
 
-Render `deploy/azure/Caddyfile.template` with the exact validated hostname. Save the new
-block separately, for example `/etc/caddy/scrip.caddy`. Back up the existing Caddyfile and
-add only an import of that file; preserve Anbabi's entire existing block. Validate the
-combined configuration with `caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile`
-before a graceful `systemctl reload caddy`. Restore the saved configuration if validation
-or reload fails. Do not restart Anbabi.
+Use `deploy/azure/configure_host.py` alongside `Caddyfile.template` on the VM. Provide
+`--hostname scrip.anwardev.me --expected-caddy-sha256 AUDITED_HASH` through sudo. The
+one-time script refuses an existing dedicated file or a changed Caddyfile, saves a backup,
+preserves the entire original configuration as a byte-for-byte prefix, and adds only an
+import of `/etc/caddy/scrip.caddy`. It validates before graceful reload and restores the
+original file if validation/reload fails. Do not restart Anbabi.
 
 The existing firewall must allow HTTP/HTTPS for Caddy's certificate challenge. Confirm the
 new hostname resolves to this VM and check any AAAA record too. Caddy can then provision

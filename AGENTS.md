@@ -14,8 +14,8 @@ Share mechanics between adapters; keep native permission semantics explicit. Avo
 frameworks, compatibility aliases, and abstraction layers without an actual use case.
 
 Development: `uv sync --locked --extra dev --extra desktop`; `uv run pytest`; `uv run ruff check .`;
-`uv run ruff format --check .`; `uv run mypy src`. Run `uv run python -m devtools.demo`
-for an isolated demo. It must not execute proposed tool commands or modify any IDE.
+`uv run ruff format --check .`; `uv run mypy src`. Desktop startup must remain free of seeded events. Use isolated regression fixtures for
+protocol checks. Tests must not execute proposed tool commands or modify any installed IDE.
 
 Keep contracts/event-v1.schema.json synchronized with the runtime schema. Test new permission,
 isolation, replay, transaction, or delivery behavior with meaningful regression cases.

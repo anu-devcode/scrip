@@ -31,15 +31,21 @@ def release_inputs(tmp_path):
             f"scrip_companion-{__version__}.dist-info/METADATA",
             f"Name: scrip-companion\nVersion: {__version__}\n",
         )
-    return source, wheel, screenshot
+    installer = tmp_path / f"Scrip-{__version__}-windows-x64-setup.exe"
+    installer.write_bytes(b"MZ" + b"test executable")
+    return source, wheel, screenshot, installer
 
 
 def test_public_bundle_is_allowlisted_and_uses_exact_wheel_hash(tmp_path, release_inputs):
-    source, wheel, screenshot = release_inputs
-    public = build_public_site(wheel, tmp_path / "public", "a" * 40, screenshot, source=source)
+    source, wheel, screenshot, installer = release_inputs
+    public = build_public_site(
+        wheel, tmp_path / "public", "a" * 40, screenshot, installer=installer, source=source
+    )
     metadata = json.loads((public / "release.json").read_text())
     assert metadata["artifact"]["sha256"] == hashlib.sha256(wheel.read_bytes()).hexdigest()
     assert metadata["version"] == __version__
+    assert metadata["installer"]["sha256"] == hashlib.sha256(installer.read_bytes()).hexdigest()
+    assert metadata["installer"]["signed"] is False
     assert not (public / ".env").exists()
     assert not (public / "private.sqlite3").exists()
     assert "__SCRIP_" not in (public / "index.html").read_text()
@@ -49,13 +55,15 @@ def test_public_bundle_is_allowlisted_and_uses_exact_wheel_hash(tmp_path, releas
 
 
 def test_release_output_never_overwrites_an_existing_directory(tmp_path, release_inputs):
-    source, wheel, screenshot = release_inputs
+    source, wheel, screenshot, installer = release_inputs
     destination = tmp_path / "existing"
     destination.mkdir()
     sentinel = destination / "other-product.txt"
     sentinel.write_text("leave me")
     with pytest.raises(ValueError, match="already exists"):
-        build_public_site(wheel, destination, "a" * 40, screenshot, source=source)
+        build_public_site(
+            wheel, destination, "a" * 40, screenshot, installer=installer, source=source
+        )
     assert sentinel.read_text() == "leave me"
 
 
@@ -63,7 +71,7 @@ def test_release_output_never_overwrites_an_existing_directory(tmp_path, release
     "extra", ["scrip_core/api-token", "scrip_core/private.sqlite3", "../key.pem"]
 )
 def test_private_or_outside_files_are_rejected_from_wheel(release_inputs, extra):
-    _, wheel, _ = release_inputs
+    _, wheel, _, _ = release_inputs
     with zipfile.ZipFile(wheel, "a") as archive:
         archive.writestr(extra, b"private")
     with pytest.raises(ValueError, match="Unexpected/private"):
@@ -71,8 +79,10 @@ def test_private_or_outside_files_are_rejected_from_wheel(release_inputs, extra)
 
 
 def test_commit_and_wheel_version_must_match_the_release(tmp_path, release_inputs):
-    source, wheel, screenshot = release_inputs
+    source, wheel, screenshot, installer = release_inputs
     with pytest.raises(ValueError, match="commit"):
-        build_public_site(wheel, tmp_path / "bad", "HEAD", screenshot, source=source)
+        build_public_site(
+            wheel, tmp_path / "bad", "HEAD", screenshot, installer=installer, source=source
+        )
     with pytest.raises(ValueError, match="Expected"):
         validate_wheel(wheel, "9.9.9a1")

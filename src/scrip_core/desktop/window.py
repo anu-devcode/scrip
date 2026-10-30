@@ -79,18 +79,19 @@ def plain_label(text: str = "") -> QLabel:
 class InboxWindow(QMainWindow):
     request_selected = Signal(str)
     dismiss_requested = Signal(str)
+    rule_requested = Signal(str)
     pause_requested = Signal(bool)
     refresh_requested = Signal()
     quit_requested = Signal()
 
-    def __init__(self, *, tray_available: bool = False, demo: bool = False) -> None:
+    def __init__(self, *, tray_available: bool = False) -> None:
         super().__init__()
         self.tray_available = tray_available
         self.requests: tuple[RequestRecord, ...] = ()
         self.selected_id = ""
         self.paused = False
         self.problem_active = False
-        self.setWindowTitle("Scrip · Agent inbox" + (" · Demo" if demo else ""))
+        self.setWindowTitle("Scrip · Agent inbox")
         self.setWindowIcon(scrip_icon())
         self.resize(1120, 760)
         self.setMinimumSize(900, 600)
@@ -101,7 +102,7 @@ class InboxWindow(QMainWindow):
         layout.setSpacing(18)
         header = QHBoxLayout()
         titles = QVBoxLayout()
-        brand = plain_label("SCRIP" + (" / DEMO" if demo else ""))
+        brand = plain_label("SCRIP")
         brand.setObjectName("brand")
         titles.addWidget(brand)
         heading = plain_label("Your agents, in view")
@@ -169,6 +170,10 @@ class InboxWindow(QMainWindow):
         self.dismiss_button.setObjectName("dismiss")
         self.dismiss_button.setEnabled(False)
         self.dismiss_button.clicked.connect(self._dismiss)
+        self.rule_button = QPushButton("Create exact approval rule...")
+        self.rule_button.setEnabled(False)
+        self.rule_button.clicked.connect(lambda: self.rule_requested.emit(self.selected_id))
+        detail_layout.addWidget(self.rule_button)
         detail_layout.addWidget(self.dismiss_button, 0, Qt.AlignmentFlag.AlignRight)
         splitter.addWidget(details)
         splitter.setSizes([340, 700])
@@ -184,6 +189,15 @@ class InboxWindow(QMainWindow):
         )
         self.sessions.horizontalHeader().setStretchLastSection(True)
         self.tabs.addTab(self.sessions, "Sessions")
+        from .connections import ConnectionsPanel
+
+        self.connections = ConnectionsPanel()
+        self.tabs.addTab(self.connections, "Connections")
+        from .rules import RulesPanel
+
+        self.rules_panel = RulesPanel()
+        self.tabs.addTab(self.rules_panel, "Rules")
+        self.tabs.setCurrentWidget(self.connections)
         layout.addWidget(self.tabs, 1)
         self.footer = plain_label(
             "Desktop alerts active · Closing the window keeps Scrip in the tray."
@@ -199,8 +213,9 @@ class InboxWindow(QMainWindow):
         if self.problem_active:
             self.footer.setText("Local state refreshed. Connection recovered.")
             self.problem_active = False
+        self.rules_panel.show_rules(snapshot.rules)
         self.paused = snapshot.status.paused
-        self.state.setText("Auto approvals paused" if self.paused else "Local inbox active")
+        self.state.setText("Auto approvals paused" if self.paused else "Local connection active")
         self.pause_button.setText(
             "Resume auto approvals" if self.paused else "Pause auto approvals"
         )
@@ -240,6 +255,7 @@ class InboxWindow(QMainWindow):
     def _selected(self, current: QListWidgetItem | None, previous: QListWidgetItem | None) -> None:
         self.selected_id = str(current.data(Qt.ItemDataRole.UserRole)) if current else ""
         self.body.clear()
+        self.rule_button.setEnabled(False)
         self.dismiss_button.setEnabled(False)
         for label in (self.host, self.workspace, self.session):
             label.setText("—")
@@ -259,8 +275,10 @@ class InboxWindow(QMainWindow):
             self.body.clear()
             self.detail_title.setText("This request is no longer pending")
             self.dismiss_button.setEnabled(False)
+            self.rule_button.setEnabled(False)
             return
         question = details.request.kind == "input"
+        self.rule_button.setEnabled(not question)
         self.detail_title.setText("Your input is needed" if question else "Review in the agent")
         self.guidance.setText(
             "Answer in the originating agent. Dismissing here only clears this local inbox item."

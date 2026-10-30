@@ -26,7 +26,7 @@ from .common import (
     JsonObject,
     QuestionFormat,
     hashed_id,
-    hook_handler,
+    hook_argv,
     normalize_questions,
     require_text,
 )
@@ -132,7 +132,17 @@ def unavailable_response(hook: str, mode: HookMode = "observe") -> JsonObject:
 def hook_configuration(data_dir: Path, mode: HookMode = "observe") -> JsonObject:
     hooks: JsonObject = {}
     for hook in HOOKS:
-        entry: JsonObject = {"hooks": [hook_handler("claude-code", hook, data_dir, mode)]}
+        arguments = hook_argv("claude-code", hook, data_dir, mode)
+        # Claude's exec form passes each argument literally, independent of the user's
+        # Bash/PowerShell configuration and of spaces or shell characters in paths.
+        handler = {
+            "type": "command",
+            "command": arguments[0],
+            "args": arguments[1:],
+            "timeout": 5,
+            "onFailure": "block" if mode == "enforce" and hook == "PreToolUse" else "continue",
+        }
+        entry: JsonObject = {"hooks": [handler]}
         if hook in ("PreToolUse", "PostToolUse"):
             entry["matcher"] = ".*"
         hooks[hook] = [entry]

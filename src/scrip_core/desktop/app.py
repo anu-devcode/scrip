@@ -2,85 +2,42 @@
 
 import os
 import sys
-import tempfile
-from contextlib import nullcontext
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from threading import Event
 
-from PySide6.QtCore import QThread
+from PySide6.QtCore import QLockFile, QThread
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
-from ..bootstrap import create_service
-from ..models import Input, InputRequested, Question, Tool, ToolRequested
-from ..service import CompanionService
+from .runtime import LocalRuntime
 from .window import InboxWindow
 from .worker import DesktopWorker, TraySink
 
 
-def seed_demo(service: CompanionService, workspace: Path) -> None:
-    """Fictional requests only; this function never executes the proposed tool."""
-    service.ingest(
-        InputRequested(
-            event_id="desktop-question",
-            operation_id="desktop-question-op",
-            adapter="claude-code",
-            session_id="demo-conversation",
-            workspace=str(workspace),
-            kind="input.requested",
-            payload=Input(
-                source_tool="AskUserQuestion",
-                questions=[
-                    Question(
-                        text="Which database should we use for the prototype?",
-                        options=[
-                            "SQLite — keep everything local",
-                            "PostgreSQL — use a shared server",
-                        ],
-                    )
-                ],
-            ),
-        )
-    )
-    service.ingest(
-        ToolRequested(
-            event_id="desktop-permission",
-            operation_id="desktop-permission-op",
-            adapter="antigravity",
-            session_id="demo-test-run",
-            workspace=str(workspace),
-            kind="tool.requested",
-            payload=Tool(name="run_command", arguments={"CommandLine": "python -m pytest"}),
-        )
-    )
-
-
-def run(data_dir: Path, *, demo: bool = False) -> int:
+def run(data_dir: Path) -> int:
     if sys.platform.startswith("linux") and not any(
         os.environ.get(name) for name in ("DISPLAY", "WAYLAND_DISPLAY", "QT_QPA_PLATFORM")
     ):
         raise ValueError(
             "Desktop requires a graphical session; use the CLI in a headless workspace"
         )
-    with (
-        tempfile.TemporaryDirectory(prefix="scrip-desktop-demo-")
-        if demo
-        else nullcontext(str(data_dir)) as directory
-    ):
-        path = Path(directory).resolve()
-        database = path / "scrip.sqlite3"
-        if not demo and not database.is_file():
-            raise ValueError("Run scrip init with this data directory first, or use desktop --demo")
-        service = create_service(database)
-        if demo:
-            seed_demo(service, path)
+    path = data_dir.resolve()
+    path.mkdir(parents=True, exist_ok=True, mode=0o700)
+    lock = QLockFile(str(path / "desktop.lock"))
+    if not lock.tryLock(0):
+        raise ValueError("Scrip is already running. Open it from the system tray.")
+    runtime = LocalRuntime(path)
+    try:
+        with ThreadPoolExecutor(max_workers=1) as startup:
+            service = startup.submit(runtime.start).result()
         app = QApplication(["scrip"])
         app.setApplicationName("Scrip")
         app.setOrganizationName("Scrip")
         app.setQuitOnLastWindowClosed(False)
         tray_available = QSystemTrayIcon.isSystemTrayAvailable()
         alerts = tray_available and QSystemTrayIcon.supportsMessages()
-        window = InboxWindow(tray_available=tray_available, demo=demo)
+        window = InboxWindow(tray_available=tray_available)
         tray = QSystemTrayIcon(window.windowIcon(), window)
         tray.setToolTip("Scrip · Agent inbox")
         menu = QMenu()
@@ -92,11 +49,20 @@ def run(data_dir: Path, *, demo: bool = False) -> int:
         stopping = Event()
         sink = TraySink(tray)
         thread = QThread()
-        worker = DesktopWorker(service, sink, stopping, alerts=alerts)
+        worker = DesktopWorker(service, sink, stopping, alerts=alerts, data_dir=path)
         worker.moveToThread(thread)
         thread.started.connect(worker.start)
         thread.finished.connect(worker.deleteLater)
         thread.finished.connect(app.quit)
+        window.connections.review_requested.connect(worker.plan_connection)
+        window.connections.apply_requested.connect(worker.connect_workspace)
+        window.connections.disconnect_requested.connect(worker.disconnect_workspace)
+        worker.connection_plan.connect(window.connections.show_plan)
+        worker.connections_ready.connect(window.connections.show_connections)
+        window.rule_requested.connect(worker.plan_rule)
+        worker.rule_plan.connect(window.rules_panel.review_rule)
+        window.rules_panel.save_requested.connect(worker.save_rule)
+        window.rules_panel.remove_requested.connect(worker.remove_rule)
         window.request_selected.connect(worker.details)
         window.dismiss_requested.connect(worker.dismiss)
         window.pause_requested.connect(worker.pause)
@@ -144,3 +110,6 @@ def run(data_dir: Path, *, demo: bool = False) -> int:
             thread.quit()
             thread.wait()
             tray.hide()
+    finally:
+        runtime.close()
+        lock.unlock()

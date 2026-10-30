@@ -63,10 +63,13 @@ def hashed_id(prefix: str, identity: str) -> str:
 
 
 def hook_argv(adapter: str, hook: str, data_dir: Path, mode: HookMode) -> list[str]:
+    launcher = (
+        [str(Path(sys.executable).with_name("scrip-cli.exe" if os.name == "nt" else "scrip-cli"))]
+        if getattr(sys, "frozen", False)
+        else [sys.executable, "-m", "scrip_core"]
+    )
     return [
-        sys.executable,
-        "-m",
-        "scrip_core",
+        *launcher,
         "--data-dir",
         str(data_dir.resolve()),
         "hook",

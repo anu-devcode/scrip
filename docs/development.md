@@ -14,11 +14,11 @@ or certified from this local workspace.
 Push changes on a task branch and open a pull request. The
 [GitHub Actions workflow](https://github.com/anu-devcode/scrip/actions) checks Windows,
 Linux, and macOS and builds the Python distributions. Version tags use a separate
-[alpha release and deployment process](deployment.md).
+[release and deployment process](deployment.md).
 For another remote development environment, clone the repository and follow the same setup
 commands. Scrip does not depend on Codespaces.
 
-Codespaces can run the desktop's offscreen tests and render a preview. The interactive
+Codespaces can run the desktop's offscreen tests and capture the empty connection screen. The interactive
 desktop requires a graphical session; this repository does not provide a browser-based
 remote desktop or a connector to agents on another machine. See [desktop setup](desktop.md).
 
@@ -30,11 +30,11 @@ uv run pytest
 uv run ruff check .
 uv run ruff format --check .
 uv run mypy src
-uv run python -m devtools.demo
+uv run scrip desktop
 uv build
 ```
 
-The isolated demo and process tests share `devtools/process.py`. They own and clean up their
+Process tests use `devtools/process.py`. They own and clean up their
 child service and temporary state, invoke only Scrip hook processes, and never execute a
 proposed agent tool. The development helpers and tests are excluded from the installed wheel.
 

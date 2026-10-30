@@ -34,8 +34,10 @@ def parser() -> argparse.ArgumentParser:
     for name in ("pause", "resume"):
         subcommands.add_parser(name).set_defaults(handler=commands.pause)
     desktop = subcommands.add_parser("desktop", help="Open the optional desktop inbox")
-    desktop.add_argument("--demo", action="store_true", help="Use temporary fictional requests")
     desktop.set_defaults(handler=commands.desktop)
+    subcommands.add_parser("diagnostics", help=argparse.SUPPRESS).set_defaults(
+        handler=commands.diagnostics
+    )
     rules = subcommands.add_parser("rules")
     rules.set_defaults(handler=commands.rules)
     actions = rules.add_subparsers(dest="rule_command", required=True)

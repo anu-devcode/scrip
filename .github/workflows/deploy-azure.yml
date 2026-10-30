@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Existing developer release tag, for example v0.1.0a1"
+        description: "Existing release tag, for example v0.2.0"
         required: true
         type: string
 
@@ -40,7 +40,7 @@ jobs:
           python - <<'PY'
           import os, re
           from urllib.parse import urlsplit
-          assert re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+a[0-9]+', os.environ['RELEASE_TAG']), 'Invalid alpha tag'
+          assert re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+(?:(?:a|b|rc)[0-9]+)?', os.environ['RELEASE_TAG']), 'Invalid release tag'
           assert re.fullmatch(r'[a-zA-Z0-9.-]+', os.environ['SCRIP_DEPLOY_HOST']), 'Missing/invalid SSH hostname'
           url = urlsplit(os.environ['SCRIP_SITE_URL'])
           assert url.scheme == 'https' and url.hostname and not url.username and not url.password and not url.query and not url.fragment and url.path in ('', '/'), 'An HTTPS site origin is required'

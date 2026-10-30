@@ -101,7 +101,9 @@ display and user reading are not acknowledged by Qt's tray API.
 The window closes to the tray when one is available; explicit Quit cancels pending handoffs,
 stops the worker, and exits. With no tray, closing the window exits. The desktop reads the
 same local database as the service; it does not use an exposed management API, launch a host,
-start the HTTP service, or bridge to another machine. See [desktop guide](desktop.md).
+or bridge to another machine. It starts an authenticated loopback service automatically
+on an available reserved port and stops only the service it owns. Existing authenticated
+services can be reused. A desktop lock prevents multiple instances for the same state. See [desktop guide](desktop.md).
 
 SQLite remains a single-writer local store. There is no claim of unlimited scale, load-tested
 throughput, multi-user tenancy, retention management, or remote coordination. Benchmark event
@@ -125,3 +127,18 @@ Tests exercise fixtures and real Scrip subprocesses over loopback, not installed
 A live adapter release needs a documented host version/platform matrix and isolated
 integration testing. No vendor files, internal commands, or automatic host installation are
 part of this architecture.
+
+
+## Explicit workspace connections
+
+The desktop worker prepares a Claude Code settings plan without writes. The GUI displays
+that plan as plain text and sends a save intent only after the user confirms. The worker
+rechecks the original bytes, backs up existing settings, preserves unrelated hooks, and
+atomically writes the result. A separate local receipt records owned entries and enables
+selective disconnection without restoring an outdated full-file backup over later edits.
+Configuration status is distinct from a session receiving events.
+
+Claude Code uses its documented executable/args hook form, avoiding shell parsing of paths.
+Frozen builds use a console hook executable next to the GUI executable. Native enforcement
+semantics remain in each adapter. The window can propose a scoped exact rule from an actual
+pending tool request; a second review precedes saving. GUI-created rules expire in 24 hours.
