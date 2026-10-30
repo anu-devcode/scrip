@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 704 240" role="img" aria-label="scrip">
+  <title>scrip</title>
+  <g transform="scale(.234375)" fill="none">
+    <g id="symbol-body">
+      <path id="symbol-body-core" fill="#101619" d="M378 566C306 596 254 650 254 706c0 84 64 144 150 144h174c102 0 174-64 174-146 0-60-36-100-88-128L552 610Z" />
+      <path id="symbol-body-loop" fill="#80DFBF" d="M374 568c-36 24-42 42-36 58 10 30 88 48 146 64l154 42c50 14 70-16 60-42-8-24-24-46-46-66 0-20 6-38 12-48 56 34 88 80 88 128 0 82-72 146-174 146h-46c30-20 30-38-2-52-40-16-82-26-122-38-68-20-130-38-130-86 0-42 42-84 96-106Z" />
+    </g>
+    <g id="symbol-head">
+      <path id="symbol-ear-left" fill="#101619" d="M294 324c-48 0-86 36-86 84v32c0 48 36 80 80 80h24V324Z" />
+      <path id="symbol-ear-right" fill="#101619" d="M726 324c42 0 72 34 72 80v38c0 44-28 78-70 78h-18V324Z" />
+      <path id="symbol-helmet" fill="#80DFBF" d="M446 144h102c106 0 188 82 188 186v146c0 58-26 80-70 94l-108 30c-20 6-42 8-60 2l-170-46c-42-12-56-30-56-72V312c0-92 58-152 144-166l30-2Z" />
+      <path id="symbol-s-fold" fill="#101619" d="M416 146c-38 12-66 32-72 52-6 24 22 34 72 46l258 68c28 8 48 22 62 38-2-64-40-110-120-110H466c-66 0-96-16-96-40 0-22 18-42 46-54Z" />
+      <path id="symbol-visor" fill="#101619" d="M356 350h278c50 0 78 30 78 74 0 50-22 74-62 84-88 22-212 24-302 4-40-10-56-32-56-78 0-46 26-84 64-84Z" />
+      <g id="symbol-eyes" fill="#80DFBF">
+        <rect id="symbol-eye-left" x="384" y="400" width="50" height="78" rx="25" />
+        <rect id="symbol-eye-right" x="568" y="400" width="50" height="78" rx="25" />
+      </g>
+    </g>
+  </g>
+  <g transform="translate(198 26) scale(1.125)" fill="none">
+    <g id="word-wordmark" stroke="#101619" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+      <path id="word-letter-s" d="M86 54c-10-12-42-14-50 0-16 24 52 22 52 40 0 20-38 30-58 14" />
+      <path id="word-letter-c" d="M184 54c-14-16-52-14-60 10-10 24 6 50 30 50 14 0 22-4 30-12" />
+      <path id="word-letter-r" d="M218 114V50m0 22c6-22 22-28 42-18" />
+      <path id="word-letter-i" d="M296 56v58" />
+      <path id="word-letter-p" d="M342 50v94m0-82c14-20 48-20 62-2 12 18 6 44-12 52-20 10-42-4-50-16" />
+    </g>
+    <circle id="word-i-dot" cx="296" cy="28" r="8" fill="#101619" />
+  </g>
+</svg>

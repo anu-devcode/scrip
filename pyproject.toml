@@ -48,6 +48,7 @@ include = [
   "/devtools",
   "/docs",
   "/contracts",
+  "/assets/brand",
   "/.github",
   "/.devcontainer",
   "/.gitattributes",

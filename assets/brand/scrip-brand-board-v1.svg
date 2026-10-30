@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1080" role="img" aria-label="Scrip identity — S-loop robot" font-family="Segoe UI, sans-serif">
+  <title>Scrip identity — S-loop robot</title>
+  <rect width="1440" height="1080" fill="#F4F7F3" />
+  <text x="72" y="70" fill="#101619" font-size="18" font-weight="600" letter-spacing="4">SCRIP / IDENTITY 01</text>
+  <text x="1368" y="70" fill="#68766E" font-size="14" text-anchor="end" letter-spacing="2">S-LOOP ROBOT</text>
+  <g transform="translate(100 130) scale(1.76)">
+    <g transform="scale(.234375)" fill="none">
+      <g id="hero-symbol-body">
+        <path id="hero-symbol-body-core" fill="#101619" d="M378 566C306 596 254 650 254 706c0 84 64 144 150 144h174c102 0 174-64 174-146 0-60-36-100-88-128L552 610Z" />
+        <path id="hero-symbol-body-loop" fill="#80DFBF" d="M374 568c-36 24-42 42-36 58 10 30 88 48 146 64l154 42c50 14 70-16 60-42-8-24-24-46-46-66 0-20 6-38 12-48 56 34 88 80 88 128 0 82-72 146-174 146h-46c30-20 30-38-2-52-40-16-82-26-122-38-68-20-130-38-130-86 0-42 42-84 96-106Z" />
+      </g>
+      <g id="hero-symbol-head">
+        <path id="hero-symbol-ear-left" fill="#101619" d="M294 324c-48 0-86 36-86 84v32c0 48 36 80 80 80h24V324Z" />
+        <path id="hero-symbol-ear-right" fill="#101619" d="M726 324c42 0 72 34 72 80v38c0 44-28 78-70 78h-18V324Z" />
+        <path id="hero-symbol-helmet" fill="#80DFBF" d="M446 144h102c106 0 188 82 188 186v146c0 58-26 80-70 94l-108 30c-20 6-42 8-60 2l-170-46c-42-12-56-30-56-72V312c0-92 58-152 144-166l30-2Z" />
+        <path id="hero-symbol-s-fold" fill="#101619" d="M416 146c-38 12-66 32-72 52-6 24 22 34 72 46l258 68c28 8 48 22 62 38-2-64-40-110-120-110H466c-66 0-96-16-96-40 0-22 18-42 46-54Z" />
+        <path id="hero-symbol-visor" fill="#101619" d="M356 350h278c50 0 78 30 78 74 0 50-22 74-62 84-88 22-212 24-302 4-40-10-56-32-56-78 0-46 26-84 64-84Z" />
+        <g id="hero-symbol-eyes" fill="#80DFBF">
+          <rect id="hero-symbol-eye-left" x="384" y="400" width="50" height="78" rx="25" />
+          <rect id="hero-symbol-eye-right" x="568" y="400" width="50" height="78" rx="25" />
+        </g>
+      </g>
+    </g>
+    <g transform="translate(198 26) scale(1.125)" fill="none">
+      <g id="hero-word-wordmark" stroke="#101619" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+        <path id="hero-word-letter-s" d="M86 54c-10-12-42-14-50 0-16 24 52 22 52 40 0 20-38 30-58 14" />
+        <path id="hero-word-letter-c" d="M184 54c-14-16-52-14-60 10-10 24 6 50 30 50 14 0 22-4 30-12" />
+        <path id="hero-word-letter-r" d="M218 114V50m0 22c6-22 22-28 42-18" />
+        <path id="hero-word-letter-i" d="M296 56v58" />
+        <path id="hero-word-letter-p" d="M342 50v94m0-82c14-20 48-20 62-2 12 18 6 44-12 52-20 10-42-4-50-16" />
+      </g>
+      <circle id="hero-word-i-dot" cx="296" cy="28" r="8" fill="#101619" />
+    </g>
+  </g>
+  <text x="720" y="570" fill="#526158" font-size="22" text-anchor="middle">A robot identity for the complete product loop.</text>
+  <rect x="72" y="626" width="416" height="324" rx="24" fill="#FFFFFF" />
+  <rect x="512" y="626" width="416" height="324" rx="24" fill="#101619" />
+  <rect x="952" y="626" width="416" height="324" rx="24" fill="#E5ECE5" />
+  <g transform="translate(166 636) scale(.22)">
+    <defs>
+      <mask id="mono-face-cutouts" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+        <rect width="1024" height="1024" fill="white" />
+        <path id="mono-s-fold" fill="black" d="M416 146c-38 12-66 32-72 52-6 24 22 34 72 46l258 68c28 8 48 22 62 38-2-64-40-110-120-110H466c-66 0-96-16-96-40 0-22 18-42 46-54Z" />
+        <path id="mono-visor" fill="black" d="M356 350h278c50 0 78 30 78 74 0 50-22 74-62 84-88 22-212 24-302 4-40-10-56-32-56-78 0-46 26-84 64-84Z" />
+        <rect id="mono-eye-left" x="384" y="400" width="50" height="78" rx="25" fill="white" />
+        <rect id="mono-eye-right" x="568" y="400" width="50" height="78" rx="25" fill="white" />
+      </mask>
+    </defs>
+    <g fill="#101619" mask="url(#mono-face-cutouts)">
+      <path id="mono-body-loop" d="M374 568c-36 24-42 42-36 58 10 30 88 48 146 64l154 42c50 14 70-16 60-42-8-24-24-46-46-66 0-20 6-38 12-48 56 34 88 80 88 128 0 82-72 146-174 146h-46c30-20 30-38-2-52-40-16-82-26-122-38-68-20-130-38-130-86 0-42 42-84 96-106Z" />
+      <path id="mono-ear-left" d="M294 324c-48 0-86 36-86 84v32c0 48 36 80 80 80h24V324Z" />
+      <path id="mono-ear-right" d="M726 324c42 0 72 34 72 80v38c0 44-28 78-70 78h-18V324Z" />
+      <path id="mono-helmet" d="M446 144h102c106 0 188 82 188 186v146c0 58-26 80-70 94l-108 30c-20 6-42 8-60 2l-170-46c-42-12-56-30-56-72V312c0-92 58-152 144-166l30-2Z" />
+    </g>
+  </g>
+  <g transform="translate(606 636) scale(.22)">
+    <defs>
+      <mask id="dark-face-cutouts" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+        <rect width="1024" height="1024" fill="white" />
+        <path id="dark-s-fold" fill="black" d="M416 146c-38 12-66 32-72 52-6 24 22 34 72 46l258 68c28 8 48 22 62 38-2-64-40-110-120-110H466c-66 0-96-16-96-40 0-22 18-42 46-54Z" />
+        <path id="dark-visor" fill="black" d="M356 350h278c50 0 78 30 78 74 0 50-22 74-62 84-88 22-212 24-302 4-40-10-56-32-56-78 0-46 26-84 64-84Z" />
+        <rect id="dark-eye-left" x="384" y="400" width="50" height="78" rx="25" fill="white" />
+        <rect id="dark-eye-right" x="568" y="400" width="50" height="78" rx="25" fill="white" />
+      </mask>
+    </defs>
+    <g fill="#80DFBF" mask="url(#dark-face-cutouts)">
+      <path id="dark-body-loop" d="M374 568c-36 24-42 42-36 58 10 30 88 48 146 64l154 42c50 14 70-16 60-42-8-24-24-46-46-66 0-20 6-38 12-48 56 34 88 80 88 128 0 82-72 146-174 146h-46c30-20 30-38-2-52-40-16-82-26-122-38-68-20-130-38-130-86 0-42 42-84 96-106Z" />
+      <path id="dark-ear-left" d="M294 324c-48 0-86 36-86 84v32c0 48 36 80 80 80h24V324Z" />
+      <path id="dark-ear-right" d="M726 324c42 0 72 34 72 80v38c0 44-28 78-70 78h-18V324Z" />
+      <path id="dark-helmet" d="M446 144h102c106 0 188 82 188 186v146c0 58-26 80-70 94l-108 30c-20 6-42 8-60 2l-170-46c-42-12-56-30-56-72V312c0-92 58-152 144-166l30-2Z" />
+    </g>
+  </g>
+  <g transform="translate(1076 656) scale(.32)">
+    <rect width="512" height="512" rx="112" fill="#101619" />
+    <g transform="matrix(.6 0 0 .6 -45.8 -42.2)">
+      <defs>
+        <mask id="app-icon-face-cutouts" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+          <rect width="1024" height="1024" fill="white" />
+          <path id="app-icon-s-fold" fill="black" d="M416 146c-38 12-66 32-72 52-6 24 22 34 72 46l258 68c28 8 48 22 62 38-2-64-40-110-120-110H466c-66 0-96-16-96-40 0-22 18-42 46-54Z" />
+          <path id="app-icon-visor" fill="black" d="M356 350h278c50 0 78 30 78 74 0 50-22 74-62 84-88 22-212 24-302 4-40-10-56-32-56-78 0-46 26-84 64-84Z" />
+          <rect id="app-icon-eye-left" x="384" y="400" width="50" height="78" rx="25" fill="white" />
+          <rect id="app-icon-eye-right" x="568" y="400" width="50" height="78" rx="25" fill="white" />
+        </mask>
+      </defs>
+      <g fill="#80DFBF" mask="url(#app-icon-face-cutouts)">
+        <path id="app-icon-body-loop" d="M374 568c-36 24-42 42-36 58 10 30 88 48 146 64l154 42c50 14 70-16 60-42-8-24-24-46-46-66 0-20 6-38 12-48 56 34 88 80 88 128 0 82-72 146-174 146h-46c30-20 30-38-2-52-40-16-82-26-122-38-68-20-130-38-130-86 0-42 42-84 96-106Z" />
+        <path id="app-icon-ear-left" d="M294 324c-48 0-86 36-86 84v32c0 48 36 80 80 80h24V324Z" />
+        <path id="app-icon-ear-right" d="M726 324c42 0 72 34 72 80v38c0 44-28 78-70 78h-18V324Z" />
+        <path id="app-icon-helmet" d="M446 144h102c106 0 188 82 188 186v146c0 58-26 80-70 94l-108 30c-20 6-42 8-60 2l-170-46c-42-12-56-30-56-72V312c0-92 58-152 144-166l30-2Z" />
+      </g>
+    </g>
+  </g>
+  <text x="280" y="912" fill="#526158" font-size="13" letter-spacing="3" text-anchor="middle">SINGLE INK</text>
+  <text x="720" y="912" fill="#A9BEB2" font-size="13" letter-spacing="3" text-anchor="middle">ON DARK</text>
+  <text x="1160" y="912" fill="#526158" font-size="13" letter-spacing="3" text-anchor="middle">APP ICON</text>
+  <rect x="72" y="1005" width="28" height="28" rx="8" fill="#80DFBF" />
+  <text x="114" y="1025" fill="#526158" font-size="14">MINT / #80DFBF</text>
+  <rect x="392" y="1005" width="28" height="28" rx="8" fill="#101619" />
+  <text x="434" y="1025" fill="#526158" font-size="14">INK / #101619</text>
+  <text x="1368" y="1025" fill="#526158" font-size="12" text-anchor="end" letter-spacing="1">FLAT MASTER • VECTOR LETTERING • MOTION LAYERS</text>
+</svg>
