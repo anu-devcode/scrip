@@ -35,8 +35,8 @@ without them. Native OS display and host-version certification remain outstandin
 
 Open Alerts to see the most recent 100 notification records, their delivery state, attempt
 count, and an error type if a send failed. Questions, tool arguments, and exception messages
-are not included in this view. Submitted to OS means the notification was handed to the
-desktop API; it does not confirm the OS displayed it or that you read it. Check Windows
+are not included in this view. Sent means a notification sender accepted it (the desktop
+API for tray alerts); it does not confirm the OS displayed it or that you read it. Check Windows
 notification settings and focus/do-not-disturb mode if an alert is missing.
 
 Waiting alerts resume when delivery is available. For a failed question or approval alert,

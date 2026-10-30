@@ -352,6 +352,6 @@ def test_submitted_alert_is_not_retryable_and_empty_state_has_no_rows(qapp, comp
     companion.deliver_notifications(ConsoleSink(lambda _: None))
     window.apply_snapshot(snapshot(companion))
     panel.table.selectRow(0)
-    assert panel.table.item(0, 1).text() == "Submitted to OS"
+    assert panel.table.item(0, 1).text() == "Sent"
     assert not panel.retry_button.isEnabled()
     window.close()

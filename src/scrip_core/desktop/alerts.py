@@ -18,7 +18,7 @@ from .window import plain_label
 STATES = {
     "queued": "Waiting to send",
     "delivering": "Sending",
-    "delivered": "Submitted to OS",
+    "delivered": "Sent",
     "failed": "Failed",
     "dismissed": "No longer needed",
 }
@@ -38,8 +38,8 @@ class AlertsPanel(QWidget):
         self.set_available(alerts_available)
         layout.addWidget(
             plain_label(
-                "Recent alerts from this computer. Submitted to OS means Scrip handed the alert "
-                "to the desktop; it does not confirm it was displayed or read. Check system "
+                "Recent alerts from this computer. Sent does not confirm an alert was displayed "
+                "or read. Check system "
                 "notification settings if alerts are missing."
             )
         )
