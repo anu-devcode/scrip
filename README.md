@@ -88,3 +88,6 @@ uv build
 See the [development guide](docs/development.md), [architecture](docs/architecture.md),
 [product plan](PRODUCT_PLAN.md), [contribution guide](CONTRIBUTING.md), and
 [security notes](SECURITY.md). Licensed under [MIT](LICENSE).
+
+The [Scrip brand kit](assets/brand/README.md) contains the editable robot symbol, custom
+wordmark, color/monochrome exports, app icons, and a 3D mascot reference.
