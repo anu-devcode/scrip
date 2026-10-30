@@ -28,7 +28,12 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="scrip-desktop-preview-") as directory:
         root = Path(directory).resolve()
         service = create_service(root / "scrip.sqlite3")
-        seed_demo(service, root)
+        public_workspace = (
+            Path("C:/Projects/scrip-demo")
+            if sys.platform == "win32"
+            else Path("/workspaces/scrip-demo")
+        )
+        seed_demo(service, public_workspace)
         window = InboxWindow(demo=True)
         window.apply_snapshot(
             DesktopSnapshot(

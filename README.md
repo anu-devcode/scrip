@@ -89,5 +89,8 @@ See the [development guide](docs/development.md), [architecture](docs/architectu
 [product plan](PRODUCT_PLAN.md), [contribution guide](CONTRIBUTING.md), and
 [security notes](SECURITY.md). Licensed under [MIT](LICENSE).
 
+For versioned developer-alpha packages, the public download site, and shared-VM hosting,
+see the [deployment guide](docs/deployment.md).
+
 The [Scrip brand kit](assets/brand/README.md) contains the editable robot symbol, custom
 wordmark, color/monochrome exports, app icons, and a 3D mascot reference.

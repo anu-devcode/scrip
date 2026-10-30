@@ -3,7 +3,7 @@
 from pathlib import Path
 
 from PySide6.QtCore import QSignalBlocker, Qt, Signal, Slot
-from PySide6.QtGui import QCloseEvent, QColor, QFont, QIcon, QPainter, QPixmap
+from PySide6.QtGui import QCloseEvent, QIcon
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QFormLayout,
@@ -66,21 +66,7 @@ QSplitter::handle { background: #101619; width: 16px; }
 
 
 def scrip_icon() -> QIcon:
-    image = QPixmap(64, 64)
-    image.fill(Qt.GlobalColor.transparent)
-    painter = QPainter(image)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-    painter.setBrush(QColor("#18372d"))
-    painter.setPen(Qt.PenStyle.NoPen)
-    painter.drawRoundedRect(2, 2, 60, 60, 16, 16)
-    painter.setPen(QColor("#80dfbf"))
-    font = QFont()
-    font.setPixelSize(43)
-    font.setBold(True)
-    painter.setFont(font)
-    painter.drawText(image.rect(), Qt.AlignmentFlag.AlignCenter, "s")
-    painter.end()
-    return QIcon(image)
+    return QIcon(str(Path(__file__).with_name("assets") / "scrip-icon.png"))
 
 
 def plain_label(text: str = "") -> QLabel:

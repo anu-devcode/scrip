@@ -1,0 +1,55 @@
+name: Developer alpha release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: startsWith(github.ref, 'refs/tags/v')
+    uses: ./.github/workflows/ci.yml
+  package:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Install alpha build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1
+          python -m pip install uv==0.13.6
+          uv sync --locked --extra dev --extra desktop
+      - name: Validate version and immutable release
+        run: |
+          uv run python -c "import os; from scrip_core import __version__; assert os.environ['RELEASE_TAG'] == 'v' + __version__, 'Tag/version mismatch'; assert 'a' in __version__, 'This workflow publishes developer alphas only'"
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "A release already exists for this tag. Use a new version; do not overwrite published artifacts."
+            exit 1
+          fi
+      - name: Build package and public download site
+        run: |
+          uv build
+          uv run python -m devtools.desktop_preview
+          uv run python -m devtools.release --output dist/release/public --commit "$(git rev-parse HEAD)" --screenshot dist/desktop-preview.png --tag "$RELEASE_TAG"
+      - name: Publish versioned developer prerelease
+        run: |
+          gh release create "$RELEASE_TAG" dist/scrip_companion-*.whl dist/scrip_companion-*.tar.gz dist/release/scrip-web-*.tar.gz dist/release/SHA256SUMS --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease --title "Scrip ${RELEASE_TAG#v} — developer alpha" --notes-file "docs/releases/${RELEASE_TAG#v}.md"

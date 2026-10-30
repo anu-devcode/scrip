@@ -607,6 +607,7 @@ desktop = [
 dev = [
     { name = "httpx2" },
     { name = "mypy" },
+    { name = "packaging" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -616,6 +617,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.115,<1" },
     { name = "httpx2", marker = "extra == 'dev'", specifier = ">=2.16,<3" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.13,<3" },
+    { name = "packaging", marker = "extra == 'dev'", specifier = ">=24,<27" },
     { name = "pydantic", specifier = ">=2.9,<3" },
     { name = "pyside6-essentials", marker = "python_full_version < '3.16' and extra == 'desktop'", specifier = ">=6.8,<7" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8,<10" },
