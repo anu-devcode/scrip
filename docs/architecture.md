@@ -74,13 +74,18 @@ are local trusted configuration and are currently listed in full.
 Notification consumers claim a bounded batch with a token and a 30-second lease, commit,
 then perform external I/O outside the transaction. Completion updates require the current
 lease token. Concurrent consumers cannot claim an active lease. Expired leases can be
-reclaimed after a crash. Resolved or dismissed requests cancel queued/in-flight records.
+reclaimed after a crash. Resolved, expired, or dismissed requests cancel queued/in-flight
+and failed records.
 
 Delivery is **at least once**: a crash after sending but before committing, or a slow consumer
 outliving its lease, can produce a duplicate. Sinks should deduplicate by notification ID.
 An already in-flight alert may still arrive after dismissal. Failed sends store only the
-exception type and become terminal `failed` records; automatic retry/backoff is not yet
-implemented. A sink can explicitly defer delivery; its current and remaining batch leases
+exception type and become `failed` records; automatic retry/backoff is not implemented.
+The desktop offers an explicit retry only for failed alerts whose associated request is
+still pending. Expiry and a conditional failed-to-queued transition share one transaction;
+concurrent retries queue it once and cannot take an active delivery lease. Attempts remain
+cumulative. Delivered records cannot be manually replayed. A sink can explicitly defer
+delivery; its current and remaining batch leases
 are returned to the queue without reviving dismissed records. Console and Qt tray consumers
 use the same delivery protocol.
 

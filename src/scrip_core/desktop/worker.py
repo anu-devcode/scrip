@@ -132,7 +132,13 @@ class DesktopWorker(QObject):
             if self.stopping.is_set():
                 return
             self.snapshot_ready.emit(
-                DesktopSnapshot(status, requests, sessions, tuple(self.service.rules()))
+                DesktopSnapshot(
+                    status,
+                    requests,
+                    sessions,
+                    tuple(self.service.rules()),
+                    tuple(self.service.notifications()),
+                )
             )
             if self.data_dir is not None:
                 self.connections_ready.emit(connection_status(self.data_dir))
@@ -141,6 +147,21 @@ class DesktopWorker(QObject):
                 self.service.deliver_notifications(self.sink, limit=1)
         except Exception as error:
             self.problem.emit(f"Refresh failed ({type(error).__name__}). Retrying shortly.")
+
+    @Slot(str)
+    def retry_notification(self, notification_id: str) -> None:
+        if self.stopping.is_set():
+            return
+        try:
+            retried = self.service.retry_notification(notification_id)
+            self.refresh()
+            self.notice.emit(
+                "Alert queued again. Delivery waits for desktop alerts to be available."
+                if retried
+                else "This alert cannot be retried. Its request may no longer be pending."
+            )
+        except Exception as error:
+            self.problem.emit(f"Could not retry alert ({type(error).__name__}).")
 
     @Slot(str)
     def details(self, request_id: str) -> None:

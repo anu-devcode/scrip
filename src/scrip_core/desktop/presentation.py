@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 
 from ..models import InputRequested, Rule
-from ..records import CoreStatus, RequestDetails, RequestRecord, SessionRecord
+from ..records import CoreStatus, NotificationRecord, RequestDetails, RequestRecord, SessionRecord
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,7 @@ class DesktopSnapshot:
     requests: tuple[RequestRecord, ...]
     sessions: tuple[SessionRecord, ...]
     rules: tuple[Rule, ...] = ()
+    notifications: tuple[NotificationRecord, ...] = ()
 
 
 def request_text(details: RequestDetails) -> str:

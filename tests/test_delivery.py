@@ -2,6 +2,8 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from threading import Lock
 
+import pytest
+
 from scrip_core.errors import DeliveryDeferred
 from scrip_core.notifications import ConsoleSink
 
@@ -145,3 +147,96 @@ def test_deferral_does_not_revive_a_dismissed_notification(companion, input_even
 
     assert companion.deliver_notifications(ConsoleSink(closing)).deferred == 1
     assert companion.notifications()[0].state == "dismissed"
+
+
+def fail_delivery(companion, event):
+    companion.ingest(event)
+
+    def unavailable(_message):
+        raise OSError("private transport details")
+
+    assert companion.deliver_notifications(ConsoleSink(unavailable)).failed == 1
+    return companion.notifications()[0]
+
+
+def test_failed_pending_alert_can_retry_once_without_replaying_its_event(companion, input_event):
+    notification = fail_delivery(companion, input_event)
+    original_details = companion.request_details(companion.inbox()[0].id)
+    assert companion.retry_notification(notification.id)
+    assert not companion.retry_notification(notification.id)
+    queued = companion.notifications()[0]
+    assert queued.state == "queued"
+    assert queued.last_error is None
+    assert queued.attempts == 1
+    assert companion.request_details(companion.inbox()[0].id) == original_details
+    assert companion.status().events == 1
+    messages = []
+    assert companion.deliver_notifications(ConsoleSink(messages.append)).delivered == 1
+    assert len(messages) == 1
+    assert companion.notifications()[0].attempts == 2
+    assert not companion.retry_notification(notification.id)
+
+
+@pytest.mark.parametrize("ending", ["dismiss", "expire", "resolve", "close"])
+def test_retry_cannot_revive_failed_alert_after_request_ends(companion, input_event, clock, ending):
+    from scrip_core.models import SessionEvent, SessionInfo, ToolCompleted, ToolResult
+
+    notification = fail_delivery(companion, input_event)
+    if ending == "dismiss":
+        companion.acknowledge(companion.inbox()[0].id)
+    elif ending == "expire":
+        clock.advance(minutes=16)
+    elif ending == "resolve":
+        companion.ingest(
+            ToolCompleted(
+                event_id="completed",
+                operation_id=input_event.operation_id,
+                adapter=input_event.adapter,
+                session_id=input_event.session_id,
+                workspace=input_event.workspace,
+                kind="tool.completed",
+                payload=ToolResult(name="ask_question"),
+            )
+        )
+    else:
+        companion.ingest(
+            SessionEvent(
+                event_id="closed",
+                adapter=input_event.adapter,
+                session_id=input_event.session_id,
+                workspace=input_event.workspace,
+                kind="session.completed",
+                payload=SessionInfo(),
+            )
+        )
+    assert not companion.retry_notification(notification.id)
+    assert companion.notifications()[0].state == "dismissed"
+    assert companion.deliver_notifications(ConsoleSink(lambda _: None)).delivered == 0
+
+
+def test_concurrent_retry_only_requeues_once_and_cannot_steal_delivery_lease(
+    companion, database, clock, input_event
+):
+    notification = fail_delivery(companion, input_event)
+    with ThreadPoolExecutor(max_workers=8) as workers:
+        results = list(
+            workers.map(lambda _: companion.retry_notification(notification.id), range(8))
+        )
+    assert sum(results) == 1
+    with database.transaction() as repository:
+        repository.claim_notifications("active-worker", clock(), timedelta(seconds=30), 1)
+    assert not companion.retry_notification(notification.id)
+    assert companion.notifications()[0].state == "delivering"
+    assert not companion.retry_notification("unknown-notification")
+
+
+def test_retry_racing_dismissal_cannot_leave_an_alert_queued(companion, input_event):
+    notification = fail_delivery(companion, input_event)
+    request_id = companion.inbox()[0].id
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        retry = workers.submit(companion.retry_notification, notification.id)
+        dismiss = workers.submit(companion.acknowledge, request_id)
+        retry.result()
+        assert dismiss.result()
+    assert companion.notifications()[0].state == "dismissed"
+    assert companion.deliver_notifications(ConsoleSink(lambda _: None)).delivered == 0

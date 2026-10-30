@@ -1,7 +1,9 @@
 # Security
 
-Scrip is currently a development alpha. No supported production release or public security
-response service has been established.
+Scrip distributes an early Windows desktop release at https://scrip.anwardev.me. Installers
+are currently unsigned. The download site is public; the companion service and private
+agent activity run locally. A monitored public security response service has not been
+established, and live host-version certification remains outstanding.
 
 ## Reporting
 
@@ -22,7 +24,11 @@ Rules are explicit local configuration, not a model safety verdict. Approvals us
 arguments and event replay protection; the host owns execution. Questions are never answered
 automatically. Hook adapters use documented interfaces and default to observation.
 
-Desktop token provisioning, hardened platform filesystem permissions, retention/deletion,
-signed installers/updates, live host certification, and a release security review remain
-required before a production release. Back up private state before upgrades; forward database
-migrations do not provide downgrade support.
+The desktop provisions a local API token automatically. Hardened platform filesystem
+permissions, retention/deletion controls, publisher signing, signed updates, live host
+certification, and a release security review remain outstanding. Back up private state before
+upgrades; forward database migrations do not provide downgrade support.
+
+Notification failures retain only an exception type, not exception messages. Manual alert
+retry requires a still-pending question or permission request, never grants permission, and
+does not replay a host operation. OS notification submission is not proof of display or reading.

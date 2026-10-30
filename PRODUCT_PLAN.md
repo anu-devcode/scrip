@@ -56,6 +56,8 @@ model, app, or remote-workspace compatibility claim is justified by this core.
 
 ## Next product deliverable
 
-Validate the desktop inbox and OS alerts in isolated graphical test environments, then
-certify live adapter behavior. Next engineering work includes delivery diagnostics/retry and
-retention controls before packaging. Keep the core usable through the CLI and local API.
+Windows x64 packaging and the Azure download site are delivered. The desktop includes
+delivery diagnostics and explicit retry for failed alerts about pending requests. Next,
+validate OS alerts in isolated graphical sessions and certify live adapter behavior with
+documented versions. Retention controls, publisher signing, and a monitored private security
+disclosure route remain outstanding. Keep the core usable through the CLI and local API.
