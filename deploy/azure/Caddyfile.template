@@ -8,8 +8,8 @@ __SCRIP_HOSTNAME__ {
         Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; object-src 'none'"
         Cache-Control "no-cache"
     }
-    @downloads path /downloads/*
-    header @downloads Cache-Control "public, max-age=31536000, immutable"
+    @artifacts path /downloads/*.exe /downloads/*.whl
+    header @artifacts Cache-Control "public, max-age=31536000, immutable"
     file_server
     handle_errors {
         rewrite * /404.html
