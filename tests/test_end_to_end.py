@@ -82,7 +82,8 @@ def test_second_host_uses_same_core_through_its_own_protocol(service):
     config = claude_code.hook_configuration(settings.data_dir, "enforce")["hooks"]
 
     def invoke(hook, payload):
-        command = config[hook][0]["hooks"][0]["command"]
+        handler = config[hook][0]["hooks"][0]
+        command = [handler["command"], *handler["args"]]
         return invoke_hook(settings, "claude-code", payload, hook, command=command)
 
     raw = {

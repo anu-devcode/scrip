@@ -4,10 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#101619" />
-    <title>Install the Scrip developer alpha</title>
+    <meta
+      name="description"
+      content="Scrip brings agent questions, requests, and exact approval rules into one local desktop companion."
+    />
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
-    <script src="app.js" defer></script>
+    <title>Download and set up Scrip</title>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -16,210 +19,142 @@
         ><img src="assets/wordmark.svg" alt="scrip" width="112" height="42"
       /></a>
       <nav aria-label="Main navigation">
-        <a href="./">Product</a><a href="privacy.html">Privacy</a>
+        <a href="./#how">How it works</a
+        ><a href="quickstart.html" class="nav-action">Download Scrip &#8599;</a>
       </nav>
     </header>
     <main id="main" class="guide wrap">
-      <p class="eyebrow">DEVELOPER ALPHA / __SCRIP_VERSION__</p>
-      <h1>Start with<br />one safe demo.</h1>
+      <p class="eyebrow">SCRIP / __SCRIP_VERSION__</p>
+      <h1>From download<br />to your first connection.</h1>
       <p class="lead">
-        The download is a Python wheel, not a one-click desktop installer. Use a
-        fresh virtual environment and Python 3.12–3.15 for the desktop.
+        Install Scrip once. Connect your workspace inside the app. Your inbox
+        starts empty and shows only real agent activity.
       </p>
       <div class="download-box">
         <div>
-          <h2>Scrip __SCRIP_VERSION__</h2>
-          <p>Python package · __SCRIP_WHEEL_SIZE__ · CLI + optional desktop</p>
+          <h2>Scrip for Windows</h2>
+          <p>
+            Windows 10/11 &middot; 64-bit &middot; __SCRIP_INSTALLER_SIZE__
+            &middot; Runtime included
+          </p>
         </div>
-        <a class="button primary" href="downloads/__SCRIP_WHEEL__" download
-          >Download wheel <span aria-hidden="true">↓</span></a
+        <a class="button primary" href="downloads/__SCRIP_INSTALLER__" download
+          >Download setup &#8595;</a
         >
       </div>
       <p class="fine-print">
-        SHA-256: <code class="checksum">__SCRIP_SHA256__</code> ·
-        <a href="downloads/SHA256SUMS">Checksum file</a>
+        Unsigned release. Windows may show an unknown-publisher warning.<br />SHA-256:
+        <code class="checksum">__SCRIP_INSTALLER_SHA256__</code><br /><a
+          href="downloads/SHA256SUMS"
+          >Download checksums</a
+        >
       </p>
       <section class="guide-step">
         <span class="step-number">01</span>
         <div>
-          <h2>Create an isolated environment.</h2>
+          <h2>Install and open Scrip.</h2>
           <p>
-            Choose your platform. These commands create a new environment,
-            install the versioned download with its checksum, and start a
-            fictional-request demo.
+            Open the downloaded setup file and follow the installer. Scrip
+            installs for your user account and adds a Start menu shortcut. Open
+            Scrip when installation finishes.
           </p>
-          <div
-            class="platform-tabs"
-            role="tablist"
-            aria-label="Installation platform"
-          >
-            <button
-              id="tab-windows"
-              type="button"
-              role="tab"
-              aria-controls="install-panel"
-              aria-selected="true"
-              data-platform="windows"
-            >
-              Windows</button
-            ><button
-              id="tab-unix"
-              type="button"
-              role="tab"
-              aria-controls="install-panel"
-              aria-selected="false"
-              tabindex="-1"
-              data-platform="unix"
-            >
-              macOS / Linux
-            </button>
-          </div>
-          <div id="install-panel" role="tabpanel" aria-labelledby="tab-windows">
-            <pre><code id="install-command" data-wheel="__SCRIP_WHEEL__" data-sha="__SCRIP_SHA256__">python -m venv .scrip-env
-.scrip-env\Scripts\python.exe -m pip install "scrip-companion[desktop] @ DOWNLOAD_URL"
-.scrip-env\Scripts\scrip.exe desktop --demo</code></pre>
-            <button
-              type="button"
-              class="copy-button"
-              data-copy="install-command"
-            >
-              Copy commands
-            </button>
-            <p
-              id="copy-status"
-              class="fine-print"
-              role="status"
-              aria-live="polite"
-            ></p>
-          </div>
-          <noscript
-            ><p>
-              JavaScript is disabled. Download the wheel above, then install it
-              in a virtual environment with
-              <code
-                >python -m pip install "path/to/__SCRIP_WHEEL__[desktop]"</code
-              >
-              and run <code>scrip desktop --demo</code>.
-            </p></noscript
-          >
-          <p class="fine-print">
-            On Linux, install the Qt runtime dependencies if needed, including
-            your distribution’s EGL library. In a headless environment, omit the
-            desktop extra and use the CLI.
+          <p>
+            The app starts its private local connection automatically. You do
+            not need to install Python, create an environment, start a service,
+            or keep a terminal open. No sample sessions or questions are added.
           </p>
         </div>
       </section>
       <section class="guide-step">
         <span class="step-number">02</span>
         <div>
-          <h2>Explore the local inbox.</h2>
+          <h2>Connect a Claude Code workspace.</h2>
           <p>
-            The demo shows a fictional question and tool request. No proposed
-            tool command executes and no agent is connected. Quit Scrip to
-            remove the demo’s temporary state; closing the window may keep it in
-            the tray.
+            In <strong>Connections</strong>, choose
+            <strong>Connect Claude Code workspace</strong> and select your
+            project folder. Choose Notifications mode for visibility with native
+            permissions unchanged, or Rules mode to use exact approval rules.
           </p>
           <p>
-            Read full request details, try local dismissal, pause/resume, and
-            inspect the sessions tab. The desktop submits generic alerts where
-            the OS supports them; actual OS display and live host versions still
-            need certification.
+            Review the configuration, then choose
+            <strong>Connect workspace</strong>. Scrip adds its documented hooks
+            to that project's Claude Code settings, preserves other settings,
+            and makes a backup. Connection setup never changes IDE application
+            files.
+          </p>
+          <p>
+            Start a new Claude Code session in the project so the host loads the
+            hooks. "Configured" means the configuration is present; the Sessions
+            tab shows activity only after real events arrive.
           </p>
         </div>
       </section>
       <section class="guide-step">
         <span class="step-number">03</span>
         <div>
-          <h2>Set up deliberate local state.</h2>
+          <h2>Work from your inbox.</h2>
           <p>
-            Use the <code>scrip</code> executable inside your environment. First
-            initialize and start the local service:
+            Keep Scrip open or in its tray. Structured questions and approval
+            requests appear with their full details. Answer questions and
+            resolve current permission prompts in Claude Code. Dismiss locally
+            clears an inbox item without sending an answer.
           </p>
-          <pre><code id="service-command">scrip --data-dir .scrip-dev init --port 18765
-scrip --data-dir .scrip-dev serve --port 18765</code></pre>
           <p>
-            Leave that terminal running. In another terminal, with the same
-            environment and working directory:
-          </p>
-          <pre><code id="desktop-command">scrip --data-dir .scrip-dev desktop
-scrip --data-dir .scrip-dev status</code></pre>
-          <p class="fine-print">
-            The service listens on <code>127.0.0.1</code>. Do not expose it
-            through a public reverse proxy or open its port to the internet.
-            Local state can contain private arguments and questions.
+            In Rules mode, select a pending approval request and choose
+            <strong>Create exact approval rule</strong>. Review the tool and
+            complete arguments before saving. The rule applies to future exact
+            matches in that workspace and expires after 24 hours. It does not
+            approve the current native prompt. Pause rules from the toolbar or
+            remove them from the Rules tab.
           </p>
         </div>
       </section>
       <section class="guide-step">
         <span class="step-number">04</span>
         <div>
-          <h2>Review an adapter before connecting it.</h2>
-          <p>Generate proposed configuration without installing anything:</p>
-          <pre><code id="adapter-command">scrip --data-dir .scrip-dev adapter capabilities --adapter claude-code
-scrip --data-dir .scrip-dev adapter config --adapter claude-code
-scrip --data-dir .scrip-dev adapter config --adapter antigravity</code></pre>
+          <h2>Stay connected on your terms.</h2>
           <p>
-            Generators default to observation. Review the output against the
-            host’s current documentation, then test in an isolated workspace.
-            Configuration is never installed implicitly. Use explicit
-            <code>--mode enforce</code> only after reviewing native behavior and
-            your exact rules.
+            Closing the window keeps Scrip in its tray when a tray is available.
+            Choose Quit to stop its local connection. Host permissions remain
+            with the agent when Scrip is unavailable.
           </p>
           <p>
-            <a href="https://code.claude.com/docs/en/hooks" rel="noreferrer"
-              >Claude Code hooks</a
-            >
-            ·
-            <a href="https://antigravity.google/docs/hooks" rel="noreferrer"
-              >Antigravity hooks</a
-            >
+            Use Connections to disconnect a workspace before uninstalling. This
+            removes Scrip's saved hook entries while preserving other hooks and
+            settings. Uninstall from Windows Settings &rarr; Apps. Private Scrip
+            history is retained separately under your user profile.
           </p>
         </div>
       </section>
       <section class="guide-note">
-        <h2>What this alpha does—and what follows.</h2>
+        <h2>Current availability</h2>
         <p>
-          Exact scoped policies, pending-input records, session/history views,
-          and the Qt inbox are implemented. Unknown enforcing requests require
-          native review; questions stay in the originating agent. A duplicate
-          automatic approval returns to review.
+          The installable build is Windows x64 with a guided Claude Code
+          workspace connection. You still need Claude Code and an active
+          session. Other agents, native macOS/Linux installers, mobile, and
+          remote controls are not included. Live host-version and
+          OS-notification certification are still in progress.
         </p>
         <p>
-          Native installers, signed updates, live host certification, delivery
-          diagnostics, retention controls, additional hosts, shipping
-          automation, token optimization, and mobile access remain future work.
-          This download does not establish universal host compatibility.
+          If no events appear, check the workspace connection status, restart
+          the agent session, and confirm Scrip is running. Managed host settings
+          can disable hooks. Do not disable your host's protections to force a
+          connection.
         </p>
         <p>
-          For this early alpha, use the private project channel through which
-          you were invited for feedback. A public support/disclosure channel is
-          still being established. Do not send tokens, private questions, or
-          unredacted state files.
+          Updates are downloaded and installed manually. There is no silent
+          updater. For developers, the
+          <a href="downloads/__SCRIP_WHEEL__">Python package</a> is also
+          available; it is not required by the Windows installer.
         </p>
-      </section>
-      <section class="guide-step">
-        <span class="step-number">↶</span>
-        <div>
-          <h2>Remove or upgrade deliberately.</h2>
-          <p>
-            Quit the desktop and stop the local service with Ctrl+C. Remove any
-            host hook entries you explicitly added. Uninstall the package from
-            its virtual environment with
-            <code>python -m pip uninstall scrip-companion</code>.
-          </p>
-          <p>
-            Private state is kept separately and is not removed by uninstall.
-            Back it up before an upgrade. Database migrations are forward-only;
-            there is no automatic downgrade. To try another alpha, create a
-            separate environment and test directory first.
-          </p>
-        </div>
       </section>
     </main>
     <footer class="footer wrap">
-      <a href="./">← Back to Scrip</a>
+      <span>&copy; 2026 Scrip</span>
       <div>
-        <a href="privacy.html">Privacy</a
+        <a href="quickstart.html">Getting started</a
+        ><a href="privacy.html">Privacy</a
+        ><a href="downloads/SHA256SUMS">Checksums</a
         ><a href="release.json">Release details</a>
       </div>
     </footer>

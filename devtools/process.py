@@ -1,4 +1,4 @@
-"""Owned local service processes shared by integration tests and the isolated demo."""
+"""Owned local service processes shared by integration tests."""
 
 import json
 import socket
@@ -83,12 +83,12 @@ def invoke_hook(
     hook: str = "PreToolUse",
     mode: HookMode = "enforce",
     *,
-    command: str | None = None,
+    command: str | list[str] | None = None,
 ) -> dict[str, Any]:
     """Execute Scrip's hook entry point only, never a proposed tool command."""
     result = subprocess.run(
         command if command is not None else hook_argv(adapter, hook, settings.data_dir, mode),
-        shell=command is not None,
+        shell=isinstance(command, str),
         input=json.dumps(payload),
         text=True,
         capture_output=True,

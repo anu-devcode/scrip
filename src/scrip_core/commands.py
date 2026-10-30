@@ -135,4 +135,10 @@ def desktop(args: argparse.Namespace) -> None:
         )
     from .desktop.app import run
 
-    raise SystemExit(run(settings_for(args).data_dir, demo=args.demo))
+    raise SystemExit(run(settings_for(args).data_dir))
+
+
+def diagnostics(args: argparse.Namespace) -> None:
+    from .desktop.diagnostics import check
+
+    check(settings_for(args).data_dir)

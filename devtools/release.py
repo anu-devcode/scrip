@@ -1,4 +1,4 @@
-"""Prepare an allowlisted public alpha website and versioned download bundle."""
+"""Prepare an allowlisted public website and versioned desktop download bundle."""
 
 import argparse
 import hashlib
@@ -22,7 +22,6 @@ WEB_FILES = (
     "privacy.html",
     "404.html",
     "styles.css",
-    "app.js",
     "robots.txt",
 )
 ASSETS = {
@@ -71,6 +70,7 @@ def build_public_site(
     commit: str,
     screenshot: Path,
     *,
+    installer: Path,
     source: Path = ROOT,
     version: str = __version__,
 ) -> Path:
@@ -78,6 +78,12 @@ def build_public_site(
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("A full lowercase source commit SHA is required")
     validate_wheel(wheel, version)
+    expected_installer = f"Scrip-{version}-windows-x64-setup.exe"
+    if installer.name != expected_installer or installer.is_symlink() or not installer.is_file():
+        raise ValueError(f"Expected a regular {expected_installer} installer")
+    with installer.open("rb") as stream:
+        if stream.read(2) != b"MZ":
+            raise ValueError("Windows installer is not an executable")
     if destination.exists():
         raise ValueError("Output directory already exists; choose a new release staging directory")
     for path in [
@@ -97,6 +103,9 @@ def build_public_site(
         "__SCRIP_WHEEL__": wheel.name,
         "__SCRIP_SHA256__": sha256(wheel),
         "__SCRIP_WHEEL_SIZE__": f"{wheel.stat().st_size / 1024:.0f} KB",
+        "__SCRIP_INSTALLER__": installer.name,
+        "__SCRIP_INSTALLER_SHA256__": sha256(installer),
+        "__SCRIP_INSTALLER_SIZE__": f"{installer.stat().st_size / (1024 * 1024):.0f} MB",
     }
     for name in WEB_FILES:
         content = (source / "web" / name).read_text(encoding="utf-8")
@@ -109,8 +118,9 @@ def build_public_site(
         shutil.copyfile(source / "assets/brand" / original, assets / name)
     shutil.copyfile(screenshot, assets / "inbox.png")
     shutil.copyfile(wheel, downloads / wheel.name)
+    shutil.copyfile(installer, downloads / installer.name)
     (downloads / "SHA256SUMS").write_text(
-        f"{sha256(wheel)}  {wheel.name}\n",
+        f"{sha256(wheel)}  {wheel.name}\n{sha256(installer)}  {installer.name}\n",
         encoding="utf-8",
         newline="\n",
     )
@@ -123,6 +133,13 @@ def build_public_site(
             "filename": wheel.name,
             "sha256": sha256(wheel),
             "bytes": wheel.stat().st_size,
+        },
+        "installer": {
+            "platform": "windows-x64",
+            "filename": installer.name,
+            "sha256": sha256(installer),
+            "bytes": installer.stat().st_size,
+            "signed": False,
         },
     }
     (destination / "release.json").write_text(
@@ -177,6 +194,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--commit", required=True)
     parser.add_argument("--screenshot", type=Path, required=True)
+    parser.add_argument("--installer", type=Path, required=True)
     parser.add_argument("--tag")
     args = parser.parse_args()
     if args.tag is not None and args.tag != f"v{__version__}":
@@ -186,11 +204,13 @@ def main() -> None:
         args.output.resolve(),
         args.commit,
         args.screenshot.resolve(),
+        installer=args.installer.resolve(),
     )
     bundle = site.parent / f"scrip-web-{__version__}.tar.gz"
     digest = make_archive(site, bundle)
     (bundle.parent / "SHA256SUMS").write_text(
-        f"{sha256(args.wheel)}  {args.wheel.name}\n{digest}  {bundle.name}\n",
+        f"{sha256(args.wheel)}  {args.wheel.name}\n"
+        f"{sha256(args.installer)}  {args.installer.name}\n{digest}  {bundle.name}\n",
         encoding="utf-8",
     )
     print(json.dumps({"site": str(site), "bundle": str(bundle), "sha256": digest}))

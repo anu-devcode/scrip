@@ -2,12 +2,23 @@
 
 from concurrent.futures import CancelledError, Future, TimeoutError
 from dataclasses import dataclass
+from datetime import timedelta
+from pathlib import Path
 from threading import Event, Lock
+from uuid import uuid4
 
 from PySide6.QtCore import QObject, Qt, QTimer, Signal, Slot
 from PySide6.QtWidgets import QSystemTrayIcon
 
+from ..connections import (
+    ConnectionPlan,
+    apply_connection,
+    connection_status,
+    disconnect,
+    plan_connection,
+)
 from ..errors import DeliveryDeferred
+from ..models import Rule, ToolRequested
 from ..records import NotificationRecord
 from ..service import CompanionService
 from .presentation import DesktopSnapshot
@@ -78,6 +89,9 @@ class TraySink(QObject):
 
 
 class DesktopWorker(QObject):
+    rule_plan = Signal(object)
+    connection_plan = Signal(object)
+    connections_ready = Signal(object)
     snapshot_ready = Signal(object)
     details_ready = Signal(str, object)
     notice = Signal(str)
@@ -90,8 +104,10 @@ class DesktopWorker(QObject):
         stopping: Event,
         *,
         alerts: bool,
+        data_dir: Path | None = None,
     ) -> None:
         super().__init__()
+        self.data_dir = data_dir
         self.service = service
         self.sink = sink
         self.stopping = stopping
@@ -115,7 +131,11 @@ class DesktopWorker(QObject):
             sessions = tuple(self.service.sessions())
             if self.stopping.is_set():
                 return
-            self.snapshot_ready.emit(DesktopSnapshot(status, requests, sessions))
+            self.snapshot_ready.emit(
+                DesktopSnapshot(status, requests, sessions, tuple(self.service.rules()))
+            )
+            if self.data_dir is not None:
+                self.connections_ready.emit(connection_status(self.data_dir))
             if self.alerts:
                 # One per tick limits alert bursts and keeps delivery within its lease.
                 self.service.deliver_notifications(self.sink, limit=1)
@@ -155,3 +175,89 @@ class DesktopWorker(QObject):
             self.refresh()
         except Exception as error:
             self.problem.emit(f"Could not change pause state ({type(error).__name__}).")
+
+    @Slot(str, str)
+    def plan_connection(self, workspace: str, mode: str) -> None:
+        if self.stopping.is_set() or self.data_dir is None:
+            return
+        try:
+            if mode not in ("observe", "enforce"):
+                raise ValueError("Unknown connection mode")
+            self.connection_plan.emit(
+                plan_connection(
+                    Path(workspace), self.data_dir, "enforce" if mode == "enforce" else "observe"
+                )
+            )
+        except (ValueError, OSError) as error:
+            self.problem.emit(str(error))
+
+    @Slot(object)
+    def connect_workspace(self, plan: ConnectionPlan) -> None:
+        if self.stopping.is_set() or self.data_dir is None:
+            return
+        try:
+            apply_connection(plan, self.data_dir)
+            self.refresh()
+            self.notice.emit(
+                "Workspace configured. Start a new Claude Code session in this project."
+            )
+        except (ValueError, OSError) as error:
+            self.problem.emit(str(error))
+
+    @Slot(str)
+    def disconnect_workspace(self, workspace: str) -> None:
+        if self.stopping.is_set() or self.data_dir is None:
+            return
+        try:
+            disconnect(Path(workspace), self.data_dir)
+            self.refresh()
+            self.notice.emit("Disconnected. Restart the Claude Code session to reload its hooks.")
+        except (ValueError, OSError) as error:
+            self.problem.emit(str(error))
+
+    @Slot(str)
+    def plan_rule(self, request_id: str) -> None:
+        if self.stopping.is_set():
+            return
+        try:
+            details = self.service.request_details(request_id)
+            if details is None or not isinstance(details.event, ToolRequested):
+                raise ValueError("Select a pending approval request to create a rule.")
+            event = details.event
+            self.rule_plan.emit(
+                Rule(
+                    id="desktop-" + uuid4().hex,
+                    adapter=event.adapter,
+                    workspace=event.workspace,
+                    tool=event.payload.name,
+                    arguments=event.payload.arguments,
+                    action="allow",
+                    expires_at=self.service.clock() + timedelta(hours=24),
+                )
+            )
+        except (ValueError, OSError) as error:
+            self.problem.emit(str(error))
+
+    @Slot(object)
+    def save_rule(self, rule: Rule) -> None:
+        if self.stopping.is_set():
+            return
+        try:
+            self.service.put_rule(rule)
+            self.refresh()
+            self.notice.emit(
+                "Rule saved for future matching calls. Review the current prompt in your agent."
+            )
+        except (ValueError, OSError) as error:
+            self.problem.emit(str(error))
+
+    @Slot(str)
+    def remove_rule(self, rule_id: str) -> None:
+        if self.stopping.is_set():
+            return
+        try:
+            self.service.remove_rule(rule_id)
+            self.refresh()
+            self.notice.emit("Rule removed.")
+        except (ValueError, OSError) as error:
+            self.problem.emit(str(error))

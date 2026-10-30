@@ -1,94 +1,53 @@
-# Desktop inbox
+# Desktop application
 
-The optional Qt desktop prototype displays pending questions and permission requests,
-full request details, recent sessions, pause/resume, and tray alerts. It shares the same
-local database as the CLI/service. It does not approve individual requests, forward answers,
-execute agent tools, install hooks, or change an IDE.
+Install the Windows setup from https://scrip.anwardev.me and open Scrip from the Start menu.
+The bundled runtime starts the authenticated loopback service automatically. New installations
+start without events, sessions, requests, or rules. There is no demo launch mode.
 
-## Try fictional requests
+## Connect
 
-On Python 3.12–3.15 in a graphical desktop session:
+Use Connections to choose an existing Claude Code project. Notifications mode observes
+without altering native permission decisions. Rules mode enables exact configured decisions;
+unknown requests need native review. Review the complete proposed settings and confirm to
+write `.claude/settings.local.json`. Scrip preserves unrelated hooks/settings and saves a
+backup. It checks for concurrent edits before saving. No vendor/application files are touched.
 
-```sh
-uv sync --locked --extra desktop
-uv run --extra desktop scrip desktop --demo
-```
+Start a new host session. Configured means the expected hooks exist; it does not mean a host
+has delivered events. Sessions and Inbox show only actual received activity. The guided
+connection supports Claude Code. Other protocol adapters remain available to developers;
+additional guided host support requires separate implementation and live validation.
 
-Demo mode uses temporary state, shows one question and one permission request, and removes
-that state after exiting. It does not start an HTTP server or connect to an agent. Use Quit
-to exit; on desktops with a tray, closing the window keeps it running there.
+## Requests and rules
 
-## Use your local service state
+Read full questions, options, tools, arguments, and workspace context in Inbox. Answer
+questions and existing permission prompts in the originating agent. Dismiss locally does
+not answer or approve anything. Create an exact approval rule from a pending tool request,
+review all fields, then save. Desktop-created rules expire in 24 hours and apply only to
+future matching calls in Rules mode. Rules can be paused globally or removed from Rules.
+Question tools cannot have execution-approval rules.
 
-Initialize a deliberate development directory and start the service:
+Closing the window keeps Scrip in the tray when available. Quit stops the service owned by
+the desktop; a separately running authenticated service is not stopped. An unrelated port
+listener is never terminated. Notifications can be disabled by OS settings; the inbox works
+without them. Native OS display and host-version certification remain outstanding.
 
-```sh
-uv run scrip --data-dir .scrip-dev init --port 18765
-uv run scrip --data-dir .scrip-dev serve --port 18765
-```
+## Disconnect, update, uninstall
 
-Then open the desktop in another terminal:
+Disconnect the project in Connections and restart its agent session to reload hooks.
+Only saved Scrip hook entries are removed; other hooks and settings are preserved. Download
+and run a newer installer to update. There is no silent updater or rollback of local database
+migrations. Uninstall from Windows Settings after disconnecting; private state remains under
+`%LOCALAPPDATA%/Scrip`. Back it up before manually removing it.
 
-```sh
-uv run --extra desktop scrip --data-dir .scrip-dev desktop
-```
-
-The service and desktop must use the same data directory. Hook configuration is still an
-explicit, separate integration step; see [development](development.md#adapter-configuration).
-The desktop does not start or stop that service. It can read existing state while the
-service is stopped, but hooks cannot submit new events until the service is running.
-
-Select an inbox row to read the full question/options or exact tool arguments. Respond in
-the originating agent. **Dismiss locally** acknowledges only the local inbox record and
-cancels its undelivered alert; it never answers or grants execution. **Pause auto approvals**
-uses the existing global pause policy. It does not stop a tool already running in the host.
-
-## Notification behavior
-
-The desktop polls local state every two seconds on a background thread and claims at most
-one alert per refresh. The GUI thread submits a generic title to Qt's system tray API; tool
-arguments and question text are not sent to the OS notification. Click an alert or the tray
-icon to open the inbox. The tray menu and window both have an explicit Quit action.
-
-If the desktop has no tray/message capability, the inbox remains usable and notification
-records stay queued. Shutdown or a timed-out GUI handoff releases the lease for a later
-attempt. Cancelled handoffs cannot subsequently show from the GUI queue. Other unexpected
-sink failures remain terminal `failed` records under the core's current delivery policy.
-
-`delivered` means accepted by the Qt tray API. It does not prove the OS displayed the alert
-or the user read it. Desktop settings, focus modes, Linux tray support, and OS permissions
-can affect display. An alert already submitted can outlive a dismissal. Crash recovery and
-lease expiry allow duplicates; exactly-once delivery and persistent OS deduplication are
-not provided. Do not run the console drain if the desktop should consume those same alerts.
-
-Qt's supported tray behavior varies by platform; see the
-[Qt system tray API](https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QSystemTrayIcon.html).
-Tests currently cover offscreen widgets and a fake native tray, not actual OS alert display
-or live host certification. Native installer, autostart, and signed updates are not provided.
-
-## Headless and remote development
-
-Codespaces and CI can build the package and run the offscreen desktop tests. They do not
-provide this native GUI in a browser. Run it in a local or remote graphical desktop session.
-The current client reads local state, not a remote agent connector.
-
-For an offscreen image using temporary fictional data:
+## Development
 
 ```sh
 uv sync --locked --extra dev --extra desktop
-uv run --extra desktop python -m devtools.desktop_preview
+uv run scrip desktop
+uv run python -m devtools.capture_desktop
 ```
 
-This writes `dist/desktop-preview.png`, which is ignored by Git. No native notification is
-displayed. Full development checks require both the `dev` and `desktop` extras; tests skip
-the GUI cases when Qt is intentionally absent from a core-only installation.
-
-## Dependencies
-
-The desktop uses the minimal official `PySide6-Essentials` wheel; Qt is not required by the
-headless core. Linux also needs Qt's system runtime libraries; CI and the development
-container install `libegl1` for offscreen Qt imports. Graphical Linux environments may need
-additional [Qt platform dependencies](https://doc.qt.io/qt-6/linux-requirements.html).
-Scrip's source license remains MIT. Qt/PySide carries separate upstream
-license terms; see the [package metadata](https://pypi.org/project/PySide6-Essentials/).
-Review dependency notices when preparing an installer or redistributing bundled libraries.
+The capture writes `dist/desktop.png` with the actual empty Connections screen and never
+starts a host, seeds events, or displays native alerts. Database reads/writes are kept off
+the GUI thread. All host-provided text renders as plain text. Offscreen tests do not connect
+real workspaces, display OS alerts, or change installed host settings.

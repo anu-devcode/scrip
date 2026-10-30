@@ -30,7 +30,7 @@ def test_missing_desktop_extra_gives_installation_instruction_without_creating_s
     monkeypatch,
 ):
     monkeypatch.setattr(commands, "find_spec", lambda _: None)
-    args = parser().parse_args(["--data-dir", str(tmp_path / "unused"), "desktop", "--demo"])
+    args = parser().parse_args(["--data-dir", str(tmp_path / "unused"), "desktop"])
     with pytest.raises(ValueError, match="uv sync --locked --extra desktop"):
         commands.desktop(args)
     assert not (tmp_path / "unused").exists()

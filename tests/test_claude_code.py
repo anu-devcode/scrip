@@ -93,7 +93,11 @@ def test_hook_configuration_is_only_generated(tmp_path):
     config = claude_code.hook_configuration(tmp_path)
     assert list(tmp_path.iterdir()) == []
     assert "hooks" in config
-    assert "hook claude-code" in config["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    handler = config["hooks"]["PreToolUse"][0]["hooks"][0]
+    assert handler["args"][handler["args"].index("hook") + 1] == "claude-code"
+    assert handler["onFailure"] == "continue"
+    enforcing = claude_code.hook_configuration(tmp_path, "enforce")
+    assert enforcing["hooks"]["PreToolUse"][0]["hooks"][0]["onFailure"] == "block"
     assert claude_code.unavailable_response("PreToolUse", "observe") == {}
     assert (
         claude_code.unavailable_response(
