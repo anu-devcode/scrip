@@ -15,7 +15,13 @@ def check(executable: Path) -> None:
     environment = {key: value for key, value in os.environ.items() if key != "PYTHONPATH"}
     with tempfile.TemporaryDirectory(prefix="scrip-native-protocol-") as directory:
         root = Path(directory).resolve()
-        with running_service(root) as (settings, client, store, workspace):
+        with running_service(root) as service:
+            settings, client, store, workspace = (
+                service.settings,
+                service.client,
+                service.companion,
+                service.workspace,
+            )
             result = subprocess.run(
                 [
                     str(executable),
