@@ -17,6 +17,7 @@ Scrip never seeds sessions or modifies IDE application files.
 
 - Guided Claude Code workspace setup through documented hooks, with review and backups.
 - A local inbox, session visibility, and tray notifications where supported by the OS.
+- An Alerts screen with delivery status and explicit retry for failed pending-request alerts.
 - Exact scoped approval rules with a 24-hour expiry when created in the desktop.
 - Rule pause/revocation and explicit disconnection that preserves other host settings.
 - An authenticated loopback service managed automatically by the desktop.

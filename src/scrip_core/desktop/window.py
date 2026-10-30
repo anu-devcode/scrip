@@ -197,6 +197,10 @@ class InboxWindow(QMainWindow):
 
         self.rules_panel = RulesPanel()
         self.tabs.addTab(self.rules_panel, "Rules")
+        from .alerts import AlertsPanel
+
+        self.alerts_panel = AlertsPanel(alerts_available=tray_available)
+        self.tabs.addTab(self.alerts_panel, "Alerts")
         self.tabs.setCurrentWidget(self.connections)
         layout.addWidget(self.tabs, 1)
         self.footer = plain_label(
@@ -210,6 +214,7 @@ class InboxWindow(QMainWindow):
 
     @Slot(object)
     def apply_snapshot(self, snapshot: DesktopSnapshot) -> None:
+        self.alerts_panel.show_snapshot(snapshot)
         if self.problem_active:
             self.footer.setText("Local state refreshed. Connection recovered.")
             self.problem_active = False

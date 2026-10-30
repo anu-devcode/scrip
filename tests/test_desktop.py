@@ -61,6 +61,7 @@ def snapshot(companion):
         companion.status(),
         tuple(companion.inbox()),
         tuple(companion.sessions()),
+        notifications=tuple(companion.notifications()),
     )
 
 
@@ -275,3 +276,82 @@ assert service.inbox() == []
     )
     assert result.returncode == 0, result.stderr
     assert "QThread: Destroyed" not in result.stderr
+
+
+def test_alerts_show_delivery_state_and_retry_only_pending_failures(qapp, companion, input_event):
+    from scrip_core.notifications import ConsoleSink
+
+    companion.ingest(input_event)
+
+    def failed(_message):
+        raise OSError("secret that must not appear")
+
+    companion.deliver_notifications(ConsoleSink(failed))
+    window = InboxWindow()
+    panel = window.alerts_panel
+    window.apply_snapshot(snapshot(companion))
+    panel.table.selectRow(0)
+    assert panel.table.item(0, 1).text() == "Failed"
+    assert panel.table.item(0, 4).text() == "OSError"
+    assert panel.retry_button.isEnabled()
+    identifier = panel.selected_id
+    window.apply_snapshot(snapshot(companion))
+    assert panel.selected_id == identifier  # Refresh retains the selected alert.
+    retries = []
+    panel.retry_requested.connect(retries.append)
+    panel.retry_button.click()
+    assert retries == [identifier]
+    assert not panel.retry_button.isEnabled()
+    assert companion.notifications()[0].state == "failed"  # Widgets emit intent only.
+    companion.acknowledge(companion.inbox()[0].id)
+    window.apply_snapshot(snapshot(companion))
+    assert panel.table.item(0, 1).text() == "No longer needed"
+    assert not panel.retry_button.isEnabled()
+    assert "unavailable" in panel.availability.text()
+    assert panel.availability.textFormat() == Qt.TextFormat.PlainText
+    window.close()
+
+
+def test_alerts_worker_retries_without_native_alerts_and_reports_stale_retry(
+    qapp, companion, input_event
+):
+    from scrip_core.notifications import ConsoleSink
+
+    companion.ingest(input_event)
+
+    def failed(_message):
+        raise OSError("private details")
+
+    companion.deliver_notifications(ConsoleSink(failed))
+    sink = TraySink(FakeTray(available=False))
+    worker = DesktopWorker(companion, sink, threading.Event(), alerts=False)
+    snapshots = []
+    notices = []
+    worker.snapshot_ready.connect(snapshots.append)
+    worker.notice.connect(notices.append)
+    identifier = companion.notifications()[0].id
+    worker.retry_notification(identifier)
+    assert snapshots[-1].notifications[0].state == "queued"
+    assert "queued again" in notices[-1]
+    assert companion.notifications()[0].attempts == 1
+    worker.retry_notification(identifier)
+    assert "cannot be retried" in notices[-1]
+    assert sink.tray.shown == []
+    sink.close()
+
+
+def test_submitted_alert_is_not_retryable_and_empty_state_has_no_rows(qapp, companion, input_event):
+    from scrip_core.notifications import ConsoleSink
+
+    window = InboxWindow()
+    panel = window.alerts_panel
+    window.apply_snapshot(snapshot(companion))
+    assert panel.table.rowCount() == 0
+    assert not panel.retry_button.isEnabled()
+    companion.ingest(input_event)
+    companion.deliver_notifications(ConsoleSink(lambda _: None))
+    window.apply_snapshot(snapshot(companion))
+    panel.table.selectRow(0)
+    assert panel.table.item(0, 1).text() == "Submitted to OS"
+    assert not panel.retry_button.isEnabled()
+    window.close()

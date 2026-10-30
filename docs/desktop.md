@@ -31,6 +31,20 @@ the desktop; a separately running authenticated service is not stopped. An unrel
 listener is never terminated. Notifications can be disabled by OS settings; the inbox works
 without them. Native OS display and host-version certification remain outstanding.
 
+## Alert delivery
+
+Open Alerts to see the most recent 100 notification records, their delivery state, attempt
+count, and an error type if a send failed. Questions, tool arguments, and exception messages
+are not included in this view. Submitted to OS means the notification was handed to the
+desktop API; it does not confirm the OS displayed it or that you read it. Check Windows
+notification settings and focus/do-not-disturb mode if an alert is missing.
+
+Waiting alerts resume when delivery is available. For a failed question or approval alert,
+select it and choose Retry failed alert. The original request must still be pending. Scrip
+rechecks this when retrying, so stale selections cannot revive resolved, expired, or dismissed
+requests. Sent alerts and agent-failure history cannot be retried from this screen. Retrying
+sends a notification only; it does not replay a tool, grant permission, or answer a question.
+
 ## Disconnect, update, uninstall
 
 Disconnect the project in Connections and restart its agent session to reload hooks.

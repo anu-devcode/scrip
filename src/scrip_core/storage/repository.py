@@ -41,7 +41,7 @@ class SqliteRepository:
 
     def _dismiss_notifications(self) -> None:
         self.connection.execute("""UPDATE notifications SET state='dismissed',delivery_token=NULL,
-            lease_until=NULL WHERE state IN ('queued','delivering') AND EXISTS
+            lease_until=NULL WHERE state IN ('queued','delivering','failed') AND EXISTS
             (SELECT 1 FROM requests r WHERE r.event_id=notifications.event_id
              AND r.status IN ('expired','acknowledged','resolved'))""")
 
@@ -303,6 +303,18 @@ class SqliteRepository:
             ).fetchone()
             claimed.append(NotificationRecord.model_validate(dict(document)))
         return claimed
+
+    def retry_notification(self, notification_id: str) -> bool:
+        return (
+            self.connection.execute(
+                """UPDATE notifications SET state='queued',last_error=NULL,
+            delivery_token=NULL,lease_until=NULL WHERE id=? AND state='failed'
+            AND EXISTS (SELECT 1 FROM requests r WHERE r.event_id=notifications.event_id
+                        AND r.status='pending')""",
+                (notification_id,),
+            ).rowcount
+            == 1
+        )
 
     def finish_notification(
         self,

@@ -205,3 +205,9 @@ class CompanionService:
             with self.uow.transaction() as repository:
                 repository.finish_notification(notification.id, token, self.clock(), error)
         return DeliveryReport(delivered=delivered, failed=failed)
+
+    def retry_notification(self, notification_id: str) -> bool:
+        """Requeue a failed alert only while its original request still needs attention."""
+        with self.uow.transaction() as repository:
+            repository.expire(self.clock())
+            return repository.retry_notification(notification_id)
