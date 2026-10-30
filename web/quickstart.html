@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101619" />
+    <title>Install the Scrip developer alpha</title>
+    <link rel="icon" href="assets/icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="header wrap">
+      <a class="brand" href="./" aria-label="Scrip home"
+        ><img src="assets/wordmark.svg" alt="scrip" width="112" height="42"
+      /></a>
+      <nav aria-label="Main navigation">
+        <a href="./">Product</a><a href="privacy.html">Privacy</a>
+      </nav>
+    </header>
+    <main id="main" class="guide wrap">
+      <p class="eyebrow">DEVELOPER ALPHA / __SCRIP_VERSION__</p>
+      <h1>Start with<br />one safe demo.</h1>
+      <p class="lead">
+        The download is a Python wheel, not a one-click desktop installer. Use a
+        fresh virtual environment and Python 3.12–3.15 for the desktop.
+      </p>
+      <div class="download-box">
+        <div>
+          <h2>Scrip __SCRIP_VERSION__</h2>
+          <p>Python package · __SCRIP_WHEEL_SIZE__ · CLI + optional desktop</p>
+        </div>
+        <a class="button primary" href="downloads/__SCRIP_WHEEL__" download
+          >Download wheel <span aria-hidden="true">↓</span></a
+        >
+      </div>
+      <p class="fine-print">
+        SHA-256: <code class="checksum">__SCRIP_SHA256__</code> ·
+        <a href="downloads/SHA256SUMS">Checksum file</a>
+      </p>
+      <section class="guide-step">
+        <span class="step-number">01</span>
+        <div>
+          <h2>Create an isolated environment.</h2>
+          <p>
+            Choose your platform. These commands create a new environment,
+            install the versioned download with its checksum, and start a
+            fictional-request demo.
+          </p>
+          <div
+            class="platform-tabs"
+            role="tablist"
+            aria-label="Installation platform"
+          >
+            <button
+              id="tab-windows"
+              type="button"
+              role="tab"
+              aria-controls="install-panel"
+              aria-selected="true"
+              data-platform="windows"
+            >
+              Windows</button
+            ><button
+              id="tab-unix"
+              type="button"
+              role="tab"
+              aria-controls="install-panel"
+              aria-selected="false"
+              tabindex="-1"
+              data-platform="unix"
+            >
+              macOS / Linux
+            </button>
+          </div>
+          <div id="install-panel" role="tabpanel" aria-labelledby="tab-windows">
+            <pre><code id="install-command" data-wheel="__SCRIP_WHEEL__" data-sha="__SCRIP_SHA256__">python -m venv .scrip-env
+.scrip-env\Scripts\python.exe -m pip install "scrip-companion[desktop] @ DOWNLOAD_URL"
+.scrip-env\Scripts\scrip.exe desktop --demo</code></pre>
+            <button
+              type="button"
+              class="copy-button"
+              data-copy="install-command"
+            >
+              Copy commands
+            </button>
+            <p
+              id="copy-status"
+              class="fine-print"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </div>
+          <noscript
+            ><p>
+              JavaScript is disabled. Download the wheel above, then install it
+              in a virtual environment with
+              <code
+                >python -m pip install "path/to/__SCRIP_WHEEL__[desktop]"</code
+              >
+              and run <code>scrip desktop --demo</code>.
+            </p></noscript
+          >
+          <p class="fine-print">
+            On Linux, install the Qt runtime dependencies if needed, including
+            your distribution’s EGL library. In a headless environment, omit the
+            desktop extra and use the CLI.
+          </p>
+        </div>
+      </section>
+      <section class="guide-step">
+        <span class="step-number">02</span>
+        <div>
+          <h2>Explore the local inbox.</h2>
+          <p>
+            The demo shows a fictional question and tool request. No proposed
+            tool command executes and no agent is connected. Quit Scrip to
+            remove the demo’s temporary state; closing the window may keep it in
+            the tray.
+          </p>
+          <p>
+            Read full request details, try local dismissal, pause/resume, and
+            inspect the sessions tab. The desktop submits generic alerts where
+            the OS supports them; actual OS display and live host versions still
+            need certification.
+          </p>
+        </div>
+      </section>
+      <section class="guide-step">
+        <span class="step-number">03</span>
+        <div>
+          <h2>Set up deliberate local state.</h2>
+          <p>
+            Use the <code>scrip</code> executable inside your environment. First
+            initialize and start the local service:
+          </p>
+          <pre><code id="service-command">scrip --data-dir .scrip-dev init --port 18765
+scrip --data-dir .scrip-dev serve --port 18765</code></pre>
+          <p>
+            Leave that terminal running. In another terminal, with the same
+            environment and working directory:
+          </p>
+          <pre><code id="desktop-command">scrip --data-dir .scrip-dev desktop
+scrip --data-dir .scrip-dev status</code></pre>
+          <p class="fine-print">
+            The service listens on <code>127.0.0.1</code>. Do not expose it
+            through a public reverse proxy or open its port to the internet.
+            Local state can contain private arguments and questions.
+          </p>
+        </div>
+      </section>
+      <section class="guide-step">
+        <span class="step-number">04</span>
+        <div>
+          <h2>Review an adapter before connecting it.</h2>
+          <p>Generate proposed configuration without installing anything:</p>
+          <pre><code id="adapter-command">scrip --data-dir .scrip-dev adapter capabilities --adapter claude-code
+scrip --data-dir .scrip-dev adapter config --adapter claude-code
+scrip --data-dir .scrip-dev adapter config --adapter antigravity</code></pre>
+          <p>
+            Generators default to observation. Review the output against the
+            host’s current documentation, then test in an isolated workspace.
+            Configuration is never installed implicitly. Use explicit
+            <code>--mode enforce</code> only after reviewing native behavior and
+            your exact rules.
+          </p>
+          <p>
+            <a href="https://code.claude.com/docs/en/hooks" rel="noreferrer"
+              >Claude Code hooks</a
+            >
+            ·
+            <a href="https://antigravity.google/docs/hooks" rel="noreferrer"
+              >Antigravity hooks</a
+            >
+          </p>
+        </div>
+      </section>
+      <section class="guide-note">
+        <h2>What this alpha does—and what follows.</h2>
+        <p>
+          Exact scoped policies, pending-input records, session/history views,
+          and the Qt inbox are implemented. Unknown enforcing requests require
+          native review; questions stay in the originating agent. A duplicate
+          automatic approval returns to review.
+        </p>
+        <p>
+          Native installers, signed updates, live host certification, delivery
+          diagnostics, retention controls, additional hosts, shipping
+          automation, token optimization, and mobile access remain future work.
+          This download does not establish universal host compatibility.
+        </p>
+        <p>
+          For this early alpha, use the private project channel through which
+          you were invited for feedback. A public support/disclosure channel is
+          still being established. Do not send tokens, private questions, or
+          unredacted state files.
+        </p>
+      </section>
+      <section class="guide-step">
+        <span class="step-number">↶</span>
+        <div>
+          <h2>Remove or upgrade deliberately.</h2>
+          <p>
+            Quit the desktop and stop the local service with Ctrl+C. Remove any
+            host hook entries you explicitly added. Uninstall the package from
+            its virtual environment with
+            <code>python -m pip uninstall scrip-companion</code>.
+          </p>
+          <p>
+            Private state is kept separately and is not removed by uninstall.
+            Back it up before an upgrade. Database migrations are forward-only;
+            there is no automatic downgrade. To try another alpha, create a
+            separate environment and test directory first.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer class="footer wrap">
+      <a href="./">← Back to Scrip</a>
+      <div>
+        <a href="privacy.html">Privacy</a
+        ><a href="release.json">Release details</a>
+      </div>
+    </footer>
+  </body>
+</html>

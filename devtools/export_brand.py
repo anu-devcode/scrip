@@ -3,6 +3,7 @@
 import copy
 import os
 import re
+import shutil
 import sys
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -229,6 +230,9 @@ def main() -> None:
         painter.end()
         if not image.save(str(icons / f"scrip-icon-{size}.png")):
             raise OSError("Could not export app icon")
+    desktop_assets = ROOT / "src/scrip_core/desktop/assets"
+    desktop_assets.mkdir(exist_ok=True)
+    shutil.copyfile(icons / "scrip-icon-512.png", desktop_assets / "scrip-icon.png")
     print(f"Brand kit exported to {BRAND}")
 
 

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Scrip alpha — privacy notes</title>
+    <link rel="icon" href="assets/icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header wrap">
+      <a class="brand" href="./" aria-label="Scrip home"
+        ><img src="assets/wordmark.svg" alt="scrip" width="112" height="42"
+      /></a>
+      <nav aria-label="Main navigation">
+        <a href="quickstart.html">Install &amp; use</a>
+      </nav>
+    </header>
+    <main class="guide wrap">
+      <p class="eyebrow">EARLY ALPHA</p>
+      <h1>Keep your<br />work local.</h1>
+      <section class="guide-note">
+        <h2>The public website</h2>
+        <p>
+          This static site distributes the developer alpha and its guides.
+          Scrip’s page code has no analytics, advertising scripts, account
+          system, contact form, or tracking cookies. The hosting provider may
+          process request and infrastructure logs according to its own policies.
+          No agent events are submitted to this website.
+        </p>
+        <h2>The local application</h2>
+        <p>
+          Current Scrip state stays in a local SQLite database and associated
+          files. Events can contain tool arguments, workspace paths, and
+          questions. The API token is a local credential, not a model-provider
+          key. Scrip does not encrypt this state; protect the data directory and
+          the OS account that owns it.
+        </p>
+        <p>
+          The current policy engine makes no model call. Your originating agent,
+          IDE, model provider, and other tools have their own data behavior;
+          using Scrip does not change their policies.
+        </p>
+        <h2>Notifications and sharing</h2>
+        <p>
+          The desktop sends generic alert titles to the OS notification backend.
+          Full request details remain in the local inbox. The current app does
+          not forward answers, add telemetry, upload state, or connect to a
+          remote synchronization service.
+        </p>
+        <p>
+          Only share deliberately redacted diagnostics through the project’s
+          private alpha feedback channel. Do not publish tokens, database files,
+          or private question/command content.
+        </p>
+        <h2>Removal</h2>
+        <p>
+          Uninstalling the package does not delete local state. Quit the
+          desktop, stop the service, remove any host entries you added, and
+          manage the data directory you selected. Back up any history you want
+          to retain before deleting that directory.
+        </p>
+        <p>
+          These notes describe this alpha’s implemented behavior. They are not a
+          claim of security certification or a replacement for an eventual
+          supported-release privacy policy.
+        </p>
+      </section>
+    </main>
+    <footer class="footer wrap">
+      <a href="./">← Back to Scrip</a
+      ><a href="quickstart.html">Installation guide</a>
+    </footer>
+  </body>
+</html>

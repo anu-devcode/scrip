@@ -13,7 +13,8 @@ or certified from this local workspace.
 
 Push changes on a task branch and open a pull request. The
 [GitHub Actions workflow](https://github.com/anu-devcode/scrip/actions) checks Windows,
-Linux, and macOS and builds the Python distributions. The workflow does not publish releases.
+Linux, and macOS and builds the Python distributions. Version tags use a separate
+[alpha release and deployment process](deployment.md).
 For another remote development environment, clone the repository and follow the same setup
 commands. Scrip does not depend on Codespaces.
 

@@ -1,0 +1,70 @@
+name: Publish website to Azure VM
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing developer release tag, for example v0.1.0a1"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scrip-azure-website
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: vars.SCRIP_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: azure-production
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+      SCRIP_DEPLOY_HOST: ${{ vars.SCRIP_DEPLOY_HOST }}
+      SCRIP_SITE_URL: ${{ vars.SCRIP_SITE_URL }}
+      SCRIP_DEPLOY_KEY: ${{ secrets.SCRIP_DEPLOY_KEY }}
+      SCRIP_KNOWN_HOSTS: ${{ secrets.SCRIP_KNOWN_HOSTS }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Validate deployment inputs
+        run: |
+          python - <<'PY'
+          import os, re
+          from urllib.parse import urlsplit
+          assert re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+a[0-9]+', os.environ['RELEASE_TAG']), 'Invalid alpha tag'
+          assert re.fullmatch(r'[a-zA-Z0-9.-]+', os.environ['SCRIP_DEPLOY_HOST']), 'Missing/invalid SSH hostname'
+          url = urlsplit(os.environ['SCRIP_SITE_URL'])
+          assert url.scheme == 'https' and url.hostname and not url.username and not url.password and not url.query and not url.fragment and url.path in ('', '/'), 'An HTTPS site origin is required'
+          assert os.environ['SCRIP_DEPLOY_KEY'] and os.environ['SCRIP_KNOWN_HOSTS'], 'Configure a restricted deployment key and pinned host identity first'
+          PY
+      - name: Download existing verified release artifacts
+        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --pattern 'scrip-web-*.tar.gz' --pattern SHA256SUMS --dir payload
+      - name: Verify release transport checksum
+        working-directory: payload
+        run: |
+          sha256sum --ignore-missing --check SHA256SUMS
+          test "$(find . -maxdepth 1 -name 'scrip-web-*.tar.gz' | wc -l)" -eq 1
+      - name: Stream bundle to the restricted publisher
+        run: |
+          umask 077
+          key="$RUNNER_TEMP/scrip-deploy-key"
+          known="$RUNNER_TEMP/scrip-known-hosts"
+          trap 'rm -f "$key" "$known"' EXIT
+          printf '%s\n' "$SCRIP_DEPLOY_KEY" > "$key"
+          printf '%s\n' "$SCRIP_KNOWN_HOSTS" > "$known"
+          archive="$(find payload -maxdepth 1 -name 'scrip-web-*.tar.gz')"
+          checksum="$(sha256sum "$archive" | cut -d ' ' -f 1)"
+          ssh -T -i "$key" -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$known" -o ConnectTimeout=15 "scrip-deploy@$SCRIP_DEPLOY_HOST" "install ${RELEASE_TAG#v} $checksum" < "$archive"
+      - name: Verify the public site version
+        run: |
+          curl --fail --show-error --silent "${SCRIP_SITE_URL%/}/health.json" > health.json
+          python -c "import json, os; data=json.load(open('health.json')); assert data['service']=='scrip-downloads' and data['version']==os.environ['RELEASE_TAG'][1:], 'Public health/version check failed'"
