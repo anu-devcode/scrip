@@ -11,6 +11,7 @@
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
     <title>Download and set up Scrip</title>
+    <script defer src="https://www.anwarhussen.tech/insights-v2.js" data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -38,13 +39,13 @@
             &middot; Runtime included
           </p>
         </div>
-        <a class="button primary" href="downloads/__SCRIP_INSTALLER__" download
+        <a data-analytics-event="download_open" class="button primary" href="downloads/__SCRIP_INSTALLER__" download
           >Download setup &#8595;</a
         >
       </div>
       <p class="fine-print">
         Unsigned release. Windows may show an unknown-publisher warning.<br />SHA-256:
-        <code class="checksum">__SCRIP_INSTALLER_SHA256__</code><br /><a
+        <code class="checksum">__SCRIP_INSTALLER_SHA256__</code><br /><a data-analytics-event="download_open"
           href="downloads/SHA256SUMS"
           >Download checksums</a
         >
@@ -144,7 +145,7 @@
         <p>
           Updates are downloaded and installed manually. There is no silent
           updater. For developers, the
-          <a href="downloads/__SCRIP_WHEEL__">Python package</a> is also
+          <a data-analytics-event="download_open" href="downloads/__SCRIP_WHEEL__">Python package</a> is also
           available; it is not required by the Windows installer.
         </p>
       </section>
@@ -154,7 +155,7 @@
       <div>
         <a href="quickstart.html">Getting started</a
         ><a href="privacy.html">Privacy</a
-        ><a href="downloads/SHA256SUMS">Checksums</a
+        ><a data-analytics-event="download_open" href="downloads/SHA256SUMS">Checksums</a
         ><a href="release.json">Release details</a>
       </div>
     </footer>

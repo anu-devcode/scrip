@@ -11,6 +11,7 @@
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
     <title>Scrip privacy</title>
+    <script defer src="https://www.anwarhussen.tech/insights-v2.js" data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -48,10 +49,7 @@
         </p>
         <h2>The website</h2>
         <p>
-          This site distributes Scrip and installation information. It has no
-          advertising trackers, analytics scripts, sign-up forms, or application
-          cookies. Hosting infrastructure handles network information such as IP
-          address and request metadata to serve downloads and maintain security.
+          This public website uses anonymous visit and download statistics from anwarhussen.tech. Random browser identifiers measure visits; Do Not Track and Global Privacy Control are respected. No local agent events, files, approval rules or credentials are sent to analytics. Hosting infrastructure also handles network information to serve downloads and maintain security.
         </p>
         <h2>Your choices</h2>
         <p>
@@ -60,6 +58,7 @@
           Keep a backup before manually removing local state. Never publish your
           local database, token, or unredacted agent requests.
         </p>
+      <p><button type="button" data-analytics-optout>Turn off visit statistics</button></p>
       </section>
     </main>
     <footer class="footer wrap">
@@ -71,5 +70,6 @@
         ><a href="release.json">Release details</a>
       </div>
     </footer>
+  <script defer src="analytics-preferences.js"></script>
   </body>
 </html>
