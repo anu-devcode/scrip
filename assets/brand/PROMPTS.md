@@ -1,5 +1,18 @@
 # Scrip identity prompts
 
+## Version 2: vector design direction
+
+Usage clarification: the S mark is the logo for branding placements. The original mint
+robot is the separate mascot for the homepage and character animation. See
+[robot motion provenance](motion/README.md) for the original robot's blink/look assets.
+
+The [v2 identity](v2/README.md) is authored as SVG geometry, not generated raster artwork.
+It uses a continuous S ribbon inspired by the word Scrip, forward-cut terminals to suggest
+momentum, and the prior robot's two calm pill eyes as transparent cutouts. The wordmark's
+initial s repeats the same ribbon. It retains mint/ink and reduces the former head/body
+construction to a compact companion monogram for product, app, motion, and future 3D use.
+The earlier image-generation prompts below document the v1 concept only.
+
 The concept and 3D reference were created with the built-in image generation tool. The flat SVG symbol and custom vector wordmark were refined separately as the editable identity masters. The SVG master, rather than either raster concept, is the shape reference for future production work.
 
 ## Initial robot concept

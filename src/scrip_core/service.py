@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+from .authorization import ProjectAuthorization
 from .errors import ConflictError, DeliveryDeferred
 from .limits import MAX_QUERY_ITEMS
 from .models import (
@@ -19,6 +20,7 @@ from .models import (
 from .policy import decide
 from .ports import Clock, NotificationSink, Repository, UnitOfWork
 from .records import (
+    CoreSnapshot,
     CoreStatus,
     DeliveryReport,
     HistoryEntry,
@@ -43,7 +45,7 @@ class CompanionService:
         self.clock = clock
         self.request_ttl = request_ttl
 
-    def ingest(self, event: Event) -> IngestResult:
+    def ingest(self, event: Event, *, authorization_id: str | None = None) -> IngestResult:
         now = self.clock()
         with self.uow.transaction() as repository:
             repository.expire(now)
@@ -84,7 +86,7 @@ class CompanionService:
                 "turn.failed": "idle",
             }.get(event.kind, "running")
             repository.update_session(event, state, now)
-            decision, request_id = self._handle(repository, event, now)
+            decision, request_id = self._handle(repository, event, now, authorization_id)
             if state in ("completed", "failed", "idle"):
                 repository.close_requests(key)
                 if event.kind in ("session.failed", "turn.failed"):
@@ -100,13 +102,38 @@ class CompanionService:
         repository: Repository,
         event: Event,
         now: datetime,
+        authorization_id: str | None = None,
     ) -> tuple[Decision, str | None]:
         request_id = None
         decision = Decision(action="none", reason="Event recorded")
         if isinstance(event, ToolRequested):
+            rules = repository.matching_rules(event)
+            authorization = repository.project_authorization() if authorization_id else None
+            if authorization is not None and authorization.id == authorization_id:
+                rules += authorization.matching_rules(event, now)
+            else:
+                authorization = None
             decision = decide(
-                event, repository.matching_rules(event), paused=repository.paused(), now=now
+                event, rules, paused=repository.paused(), now=now, authorization=authorization
             )
+            if (
+                decision.action == "allow"
+                and authorization is not None
+                and authorization.session is not None
+                and authorization.session.session_id is None
+                and authorization.session.matches(event)
+            ):
+                # Binding and approval commit with the event in one transaction. Concurrent
+                # conversations cannot both acquire the same active project session grant.
+                repository.set_project_authorization(
+                    authorization.model_copy(
+                        update={
+                            "session": authorization.session.model_copy(
+                                update={"session_id": event.session_id}
+                            )
+                        }
+                    )
+                )
             if decision.action == "ask" and event.policy_mode == "enforce":
                 request_id = repository.request(
                     event,
@@ -124,6 +151,45 @@ class CompanionService:
         elif isinstance(event, ToolCompleted):
             repository.resolve_operation((event.adapter, event.session_id), event.operation_id)
         return decision, request_id
+
+    def project_authorization(self) -> ProjectAuthorization | None:
+        with self.uow.transaction(write=False) as repository:
+            return repository.project_authorization()
+
+    def set_project_authorization(self, authorization: ProjectAuthorization | None) -> None:
+        with self.uow.transaction() as repository:
+            repository.set_project_authorization(authorization)
+
+    def activate_project_authorization(
+        self, authorization: ProjectAuthorization
+    ) -> ProjectAuthorization:
+        with self.uow.transaction() as repository:
+            current = repository.project_authorization()
+            if (
+                current is not None
+                and current.id == authorization.id
+                and current.expires_at > self.clock()
+                and current.session is not None
+                and authorization.session is not None
+                and current.session.adapter == authorization.session.adapter
+                and current.session.workspace == authorization.session.workspace
+                and current.session.tool == authorization.session.tool
+            ):
+                return current
+            repository.set_project_authorization(authorization)
+            return authorization
+
+    def snapshot(self) -> CoreSnapshot:
+        """Read one consistent desktop view and expire requests once per refresh."""
+        with self.uow.transaction() as repository:
+            repository.expire(self.clock())
+            return CoreSnapshot(
+                repository.status(),
+                tuple(repository.inbox()),
+                tuple(repository.sessions()),
+                tuple(repository.rules()),
+                tuple(repository.notifications()),
+            )
 
     def inbox(self) -> list[RequestRecord]:
         with self.uow.transaction() as repository:

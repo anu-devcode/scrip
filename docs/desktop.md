@@ -6,7 +6,9 @@ start without events, sessions, requests, or rules. There is no demo launch mode
 
 ## Connect
 
-Use Connections to choose an existing Claude Code project. Notifications mode observes
+In the development tree, Connections offers Claude Code and Cursor. Choose the host and an
+existing local project. The published v0.2.1 installer offers Claude Code only.
+Claude Code Notifications mode observes
 without altering native permission decisions. Rules mode enables exact configured decisions;
 unknown requests need native review. Review the complete proposed settings and confirm to
 write `.claude/settings.local.json`. Scrip preserves unrelated hooks/settings and saves a
@@ -14,8 +16,11 @@ backup. It checks for concurrent edits before saving. No vendor/application file
 
 Start a new host session. Configured means the expected hooks exist; it does not mean a host
 has delivered events. Sessions and Inbox show only actual received activity. The guided
-connection supports Claude Code. Other protocol adapters remain available to developers;
-additional guided host support requires separate implementation and live validation.
+connection supports Claude Code and, in the development tree, local single-root Cursor.
+Cursor visibility mode installs no permission hooks. Its rules mode handles shell/MCP
+requests and leaves other permission surfaces in Cursor. It does not capture native
+structured questions. See [Cursor's capability limits](integrations/cursor.md).
+Additional guided host support requires separate implementation and live validation.
 
 ## Requests and rules
 

@@ -17,14 +17,14 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ..connections import ConnectionPlan
+from ..connections import WORKSPACE_HOSTS, ConnectionPlan, ConnectionStatus, workspace_host
 from .window import plain_label
 
 
 class ConnectionsPanel(QWidget):
-    review_requested = Signal(str, str)
+    review_requested = Signal(str, str, str)
     apply_requested = Signal(object)
-    disconnect_requested = Signal(str)
+    disconnect_requested = Signal(str, str)
 
     def __init__(self) -> None:
         super().__init__()
@@ -34,36 +34,38 @@ class ConnectionsPanel(QWidget):
         layout.addWidget(title)
         layout.addWidget(
             plain_label(
-                "Connect Claude Code using its documented workspace hooks. Choose your project, "
+                "Connect an agent using its documented workspace hooks. Choose your project, "
                 "review the change, then restart its session. Existing settings are preserved and "
                 "backed up. No IDE application files are changed."
             )
         )
         options = QHBoxLayout()
+        self.host = QComboBox()
+        self.host.setAccessibleName("Agent to connect")
+        for host in WORKSPACE_HOSTS.values():
+            self.host.addItem(host.label, host.id)
+        options.addWidget(self.host)
         self.mode = QComboBox()
         self.mode.addItem("Notifications and visibility", "observe")
         self.mode.addItem("Notifications and exact approval rules", "enforce")
         options.addWidget(self.mode)
-        self.connect_button = QPushButton("Connect Claude Code workspace")
+        self.connect_button = QPushButton("Connect workspace")
         self.connect_button.clicked.connect(self._choose)
         options.addWidget(self.connect_button)
         options.addStretch()
         layout.addLayout(options)
-        layout.addWidget(
-            plain_label(
-                "Notifications mode keeps native permissions unchanged. Rules mode can approve "
-                "only actions matching rules you explicitly save. "
-                "Other actions need native review. "
-                "Questions are answered in Claude Code."
-            )
-        )
-        self.table = QTableWidget(0, 3)
-        self.table.setHorizontalHeaderLabels(["Workspace", "Mode", "Connection"])
+        self.guidance = plain_label()
+        layout.addWidget(self.guidance)
+        self.host.currentIndexChanged.connect(self._host_changed)
+        self._host_changed()
+        self.table = QTableWidget(0, 4)
+        self.table.setHorizontalHeaderLabels(["Agent", "Workspace", "Mode", "Connection"])
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.horizontalHeader().setStretchLastSection(True)
-        self.table.setColumnWidth(0, 400)
-        self.items: list[tuple[str, str, str]] = []
+        self.table.setColumnWidth(0, 130)
+        self.table.setColumnWidth(1, 360)
+        self.items: list[ConnectionStatus] = []
         layout.addWidget(self.table, 1)
         remove = QPushButton("Disconnect selected workspace")
         remove.clicked.connect(self._disconnect)
@@ -71,20 +73,44 @@ class ConnectionsPanel(QWidget):
         layout.addWidget(
             plain_label(
                 "Configured means hooks are installed. Sessions appear only after real agent "
-                "events arrive. Claude Code is the guided connection in this release. Other "
-                "agents and IDEs need their own supported integration."
+                "events arrive. Claude Code and local, single-root Cursor workspaces have "
+                "guided setup. Cloud, remote, multi-root, and other hosts require "
+                "separate validation."
             )
         )
 
+    def _host_changed(self) -> None:
+        cursor = self.host.currentData() == "cursor"
+        self.mode.setItemText(
+            0, "Session and completed-tool visibility" if cursor else "Notifications and visibility"
+        )
+        self.mode.setItemText(
+            1,
+            "Visibility and shell/MCP rules"
+            if cursor
+            else "Notifications and exact approval rules",
+        )
+        self.guidance.setText(
+            "Cursor visibility mode adds no permission hooks. Rules mode handles shell and MCP "
+            "requests only; other permissions stay in Cursor. Repeated identical calls within "
+            "one turn need native review. Native question forwarding is unavailable. "
+            "These project hooks reference this computer; do not copy them to cloud agents."
+            if cursor
+            else "Notifications mode keeps native permissions unchanged. Rules mode approves only "
+            "actions matching rules you explicitly save. Other actions need native review. "
+            "Questions are answered in Claude Code."
+        )
+
     def _choose(self) -> None:
-        workspace = QFileDialog.getExistingDirectory(self, "Choose your Claude Code workspace")
+        host = workspace_host(str(self.host.currentData()))
+        workspace = QFileDialog.getExistingDirectory(self, f"Choose your {host.label} workspace")
         if workspace:
-            self.review_requested.emit(workspace, str(self.mode.currentData()))
+            self.review_requested.emit(workspace, str(self.mode.currentData()), host.id)
 
     @Slot(object)
     def show_plan(self, plan: ConnectionPlan) -> None:
         dialog = QDialog(self)
-        dialog.setWindowTitle("Connect Claude Code")
+        dialog.setWindowTitle(f"Connect {workspace_host(plan.adapter).label}")
         dialog.resize(760, 620)
         layout = QVBoxLayout(dialog)
         layout.addWidget(plain_label(f"Review changes to {plan.target}"))
@@ -109,25 +135,45 @@ class ConnectionsPanel(QWidget):
             self.apply_requested.emit(plan)
 
     @Slot(object)
-    def show_connections(self, items: list[tuple[str, str, str]]) -> None:
+    def show_connections(self, items: list[ConnectionStatus]) -> None:
         if items == self.items:
             return
+        selected = self.table.currentRow()
+        key = self.items[selected] if 0 <= selected < len(self.items) else None
         self.items = items
         self.table.setRowCount(len(items))
         for row, item in enumerate(items):
-            for column, value in enumerate(item):
+            host = WORKSPACE_HOSTS.get(item.adapter)
+            for column, value in enumerate(
+                (host.label if host else item.adapter, item.workspace, item.mode, item.status)
+            ):
                 self.table.setItem(row, column, QTableWidgetItem(value))
+        self.table.clearSelection()
+        self.table.setCurrentCell(-1, -1)
+        if key is not None:
+            row = next(
+                (
+                    i
+                    for i, item in enumerate(items)
+                    if (item.adapter, item.workspace) == (key.adapter, key.workspace)
+                ),
+                -1,
+            )
+            if row >= 0:
+                self.table.selectRow(row)
 
     def _disconnect(self) -> None:
         row = self.table.currentRow()
         if row < 0:
             return
-        item = self.table.item(row, 0)
-        if item is None:
+        if row >= len(self.items):
             return
-        workspace = item.text()
+        item = self.items[row]
+        if item.adapter not in WORKSPACE_HOSTS:
+            return
+        workspace = item.workspace
         dialog = QDialog(self)
-        dialog.setWindowTitle("Disconnect workspace")
+        dialog.setWindowTitle(f"Disconnect {workspace_host(item.adapter).label}")
         layout = QVBoxLayout(dialog)
         layout.addWidget(plain_label(f"Remove Scrip's hooks from {Path(workspace)}?"))
         layout.addWidget(
@@ -140,4 +186,4 @@ class ConnectionsPanel(QWidget):
         buttons.rejected.connect(dialog.reject)
         layout.addWidget(buttons)
         if dialog.exec() == QDialog.DialogCode.Accepted:
-            self.disconnect_requested.emit(workspace)
+            self.disconnect_requested.emit(workspace, item.adapter)

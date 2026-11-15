@@ -24,8 +24,8 @@ def svg(view_box: str, title: str) -> ET.Element:
     return root
 
 
-def write(name: str, root: ET.Element) -> Path:
-    path = BRAND / name
+def write(name: str, root: ET.Element, *, directory: Path = BRAND) -> Path:
+    path = directory / name
     ET.indent(root)
     path.write_text(ET.tostring(root, encoding="unicode") + "\n", encoding="utf-8", newline="\n")
     return path
@@ -81,11 +81,29 @@ def label(parent: ET.Element, x: int, y: int, text: str, **attributes: str) -> N
     parent.append(node)
 
 
+def render_png(source: Path, destination: Path, width: int) -> None:
+    """Render a vector export without changing source artwork or application assets."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QImage, QPainter
+    from PySide6.QtSvg import QSvgRenderer
+
+    renderer = QSvgRenderer(str(source))
+    if not renderer.isValid():
+        raise ValueError(f"Invalid SVG: {source}")
+    view = renderer.viewBoxF()
+    height = round(width * view.height() / view.width())
+    image = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
+    image.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(image)
+    renderer.render(painter)
+    painter.end()
+    if not image.save(str(destination)):
+        raise OSError(f"Could not export {destination}")
+
+
 def main() -> None:
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
-    from PySide6.QtCore import Qt
-    from PySide6.QtGui import QFont, QFontDatabase, QImage, QPainter
-    from PySide6.QtSvg import QSvgRenderer
+    from PySide6.QtGui import QFont, QFontDatabase
     from PySide6.QtWidgets import QApplication
 
     master = ET.parse(BRAND / "scrip-symbol-v1.svg").getroot()
@@ -206,30 +224,12 @@ def main() -> None:
         if families:
             app.setFont(QFont(families[0]))
     for path in BRAND.glob("*.svg"):
-        renderer = QSvgRenderer(str(path))
-        if not renderer.isValid():
-            raise ValueError(f"Invalid SVG: {path}")
-        view = renderer.viewBoxF()
         width = 1440 if "board" in path.name else 1024
-        height = round(width * view.height() / view.width())
-        image = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
-        image.fill(Qt.GlobalColor.transparent)
-        painter = QPainter(image)
-        renderer.render(painter)
-        painter.end()
-        if not image.save(str(path.with_suffix(".png"))):
-            raise OSError(f"Could not export {path}")
+        render_png(path, path.with_suffix(".png"), width)
     icons = BRAND / "icons"
     icons.mkdir(exist_ok=True)
-    renderer = QSvgRenderer(str(BRAND / "scrip-app-icon-v1.svg"))
     for size in (16, 24, 32, 64, 128, 256, 512):
-        image = QImage(size, size, QImage.Format.Format_ARGB32_Premultiplied)
-        image.fill(Qt.GlobalColor.transparent)
-        painter = QPainter(image)
-        renderer.render(painter)
-        painter.end()
-        if not image.save(str(icons / f"scrip-icon-{size}.png")):
-            raise OSError("Could not export app icon")
+        render_png(BRAND / "scrip-app-icon-v1.svg", icons / f"scrip-icon-{size}.png", size)
     desktop_assets = ROOT / "src/scrip_core/desktop/assets"
     desktop_assets.mkdir(exist_ok=True)
     shutil.copyfile(icons / "scrip-icon-512.png", desktop_assets / "scrip-icon.png")

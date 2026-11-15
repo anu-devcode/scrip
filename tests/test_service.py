@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 
 import pytest
 
@@ -7,6 +8,30 @@ from scrip_core.errors import ConflictError
 from scrip_core.models import SessionEvent, ToolCompleted, ToolResult, utc_now
 from scrip_core.notifications import ConsoleSink
 from tests.factories import rule_for
+
+
+def test_snapshot_uses_one_transaction_and_expires_consistently(companion, clock, input_event):
+    companion.ingest(input_event)
+    clock.advance(minutes=16)
+    underlying = companion.uow
+
+    class CountingUnitOfWork:
+        calls = 0
+
+        @contextmanager
+        def transaction(self, *, write=True):
+            self.calls += 1
+            with underlying.transaction(write=write) as repository:
+                yield repository
+
+    counted = CountingUnitOfWork()
+    companion.uow = counted
+    snapshot = companion.snapshot()
+    assert counted.calls == 1
+    assert snapshot.status.events == 1
+    assert snapshot.requests == ()
+    assert snapshot.sessions[0].state == "running"
+    assert snapshot.notifications[0].state == "dismissed"
 
 
 def test_duplicate_input_survives_restart_without_duplicate_notifications(

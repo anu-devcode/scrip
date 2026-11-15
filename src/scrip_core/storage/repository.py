@@ -5,6 +5,7 @@ import json
 import sqlite3
 from datetime import datetime, timedelta
 
+from ..authorization import ProjectAuthorization
 from ..errors import ConflictError
 from ..limits import MAX_QUERY_ITEMS
 from ..models import EVENT, Event, IngestResult, InputRequested, Rule, SessionEvent, ToolRequested
@@ -24,6 +25,22 @@ NOTIFICATION_COLUMNS = "id,event_id,kind,title,state,created_at,delivered_at,att
 class SqliteRepository:
     def __init__(self, connection: sqlite3.Connection) -> None:
         self.connection = connection
+
+    def project_authorization(self) -> ProjectAuthorization | None:
+        row = self.connection.execute(
+            "SELECT value FROM settings WHERE key='project_authorization'"
+        ).fetchone()
+        return ProjectAuthorization.model_validate_json(row["value"]) if row else None
+
+    def set_project_authorization(self, authorization: ProjectAuthorization | None) -> None:
+        if authorization is None:
+            self.connection.execute("DELETE FROM settings WHERE key='project_authorization'")
+        else:
+            self.connection.execute(
+                "INSERT INTO settings VALUES('project_authorization',?) "
+                "ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+                (authorization.model_dump_json(),),
+            )
 
     def expire(self, now: datetime) -> None:
         affected = self.connection.execute(

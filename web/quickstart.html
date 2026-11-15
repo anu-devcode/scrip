@@ -6,157 +6,310 @@
     <meta name="theme-color" content="#101619" />
     <meta
       name="description"
-      content="Scrip brings agent questions, requests, and exact approval rules into one local desktop companion."
+      content="Install Scrip Terminal on Windows, review project hooks once, then control conversation command approvals with scrip start and scrip stop."
     />
+    <link rel="canonical" href="https://scrip.anwardev.me/quickstart.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Get started — Scrip" />
+    <meta
+      property="og:description"
+      content="Install Scrip Terminal on Windows, review project hooks once, then control conversation command approvals with scrip start and scrip stop."
+    />
+    <meta
+      property="og:url"
+      content="https://scrip.anwardev.me/quickstart.html"
+    />
+    <meta
+      property="og:image"
+      content="https://scrip.anwardev.me/assets/mascot.png"
+    />
+    <meta name="twitter:card" content="summary" />
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
-    <title>Download and set up Scrip</title>
+    <title>Get started — Scrip</title>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="header wrap">
       <a class="brand" href="./" aria-label="Scrip home"
-        ><img src="assets/wordmark.svg" alt="scrip" width="112" height="42"
+        ><img src="assets/wordmark.svg" width="144" height="40" alt="scrip"
       /></a>
       <nav aria-label="Main navigation">
-        <a href="./#how">How it works</a
-        ><a href="quickstart.html" class="nav-action">Download Scrip &#8599;</a>
+        <a href="./#how">How it works</a><a href="support.html">Support</a
+        ><a href="quickstart.html" class="nav-download"
+          >Get Scrip <span aria-hidden="true">↗</span></a
+        >
       </nav>
     </header>
-    <main id="main" class="guide wrap">
-      <p class="eyebrow">SCRIP / __SCRIP_VERSION__</p>
-      <h1>From download<br />to your first connection.</h1>
-      <p class="lead">
-        Install Scrip once. Connect your workspace inside the app. Your inbox
-        starts empty and shows only real agent activity.
-      </p>
-      <div class="download-box">
-        <div>
-          <h2>Scrip for Windows</h2>
-          <p>
-            Windows 10/11 &middot; 64-bit &middot; __SCRIP_INSTALLER_SIZE__
-            &middot; Runtime included
-          </p>
-        </div>
-        <a class="button primary" href="downloads/__SCRIP_INSTALLER__" download
-          >Download setup &#8595;</a
-        >
+    <main id="main">
+      <div class="page-intro wrap">
+        <p class="eyebrow">GET STARTED / __SCRIP_VERSION__</p>
+        <h1>From download<br />to your next session.</h1>
+        <p class="lead">
+          A bundled Windows command-line app. One explicit project setup. Two
+          commands for the workday.
+        </p>
       </div>
-      <p class="fine-print">
-        Unsigned release. Windows may show an unknown-publisher warning.<br />SHA-256:
-        <code class="checksum">__SCRIP_INSTALLER_SHA256__</code><br /><a
-          href="downloads/SHA256SUMS"
-          >Download checksums</a
-        >
-      </p>
-      <section class="guide-step">
-        <span class="step-number">01</span>
-        <div>
-          <h2>Install and open Scrip.</h2>
-          <p>
-            Open the downloaded setup file and follow the installer. Scrip
-            installs for your user account and adds a Start menu shortcut. Open
-            Scrip when installation finishes.
-          </p>
-          <p>
-            The app starts its private local connection automatically. You do
-            not need to install Python, create an environment, start a service,
-            or keep a terminal open. No sample sessions or questions are added.
-          </p>
+      <div class="docs-grid wrap">
+        <aside class="docs-nav" aria-label="On this page">
+          <a href="#install">01 — Install</a><a href="#connect">02 — Connect</a
+          ><a href="#start">03 — Start & stop</a
+          ><a href="#optional">Exact command mode</a
+          ><a href="#remove">Update & remove</a
+          ><a href="support.html">Troubleshooting ↗</a>
+        </aside>
+        <div class="docs-body">
+          <section id="install">
+            <p class="eyebrow">01 / INSTALL</p>
+            <h2>Get the terminal app.</h2>
+            <div class="download-box">
+              <div>
+                <h3>Scrip Terminal __SCRIP_VERSION__</h3>
+                <p>Windows 10/11 · x64 · __SCRIP_INSTALLER_SIZE__</p>
+              </div>
+              <a
+                class="button primary"
+                href="downloads/__SCRIP_INSTALLER__"
+                download
+                >Download setup ↓</a
+              >
+            </div>
+            <p>
+              Run the installer for your Windows user. Keep “Add Scrip to your
+              user PATH” selected. The runtime is included; you don’t need
+              Python, an account, or a model API key.
+            </p>
+            <p>
+              <strong
+                >Restart your editor or Antigravity once after
+                installation</strong
+              >
+              so its terminal and hooks receive the new PATH.
+            </p>
+            <div class="notice">
+              <strong>Unsigned Windows installer</strong>
+              <p>
+                This release has no publisher signature. Checksums verify file
+                integrity. Publisher signing is still outstanding. Use the
+                official download and review your organization’s software
+                policy.
+              </p>
+              <a href="downloads/SHA256SUMS">Download SHA-256 checksums ↗</a>
+            </div>
+            <details class="checksum-details">
+              <summary>Verify this installer’s checksum</summary>
+              <p class="checksum">__SCRIP_INSTALLER_SHA256__</p>
+              <div class="code-block">
+                <div class="code-heading">
+                  <span>PowerShell</span
+                  ><button
+                    type="button"
+                    class="copy"
+                    data-copy="Get-FileHash .\__SCRIP_INSTALLER__ -Algorithm SHA256"
+                    aria-label="Copy Get-FileHash .\__SCRIP_INSTALLER__ -Algorithm SHA256"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <pre><code>Get-FileHash .\__SCRIP_INSTALLER__ -Algorithm SHA256</code></pre>
+              </div>
+            </details>
+          </section>
+          <section id="connect">
+            <p class="eyebrow">02 / CONNECT ONCE</p>
+            <h2>Review your project hook.</h2>
+            <p>
+              Open a terminal in the project root used by your Antigravity
+              conversation. Preview the complete proposed configuration:
+            </p>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip setup"
+                  aria-label="Copy scrip setup"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip setup</code></pre>
+            </div>
+            <p>
+              Review the named Scrip entry. To approve saving it to that
+              project’s <code>.agents/hooks.json</code>, run:
+            </p>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip setup --apply"
+                  aria-label="Copy scrip setup --apply"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip setup --apply</code></pre>
+            </div>
+            <p>
+              Setup preserves other hooks, makes a backup of existing settings,
+              and leaves approvals stopped. Begin a new agent turn so
+              Antigravity loads the hook. Existing approval prompts still need a
+              response in the host.
+            </p>
+          </section>
+          <section id="start">
+            <p class="eyebrow">03 / YOUR DAILY CONTROLS</p>
+            <h2>Start. Work. Stop.</h2>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip start"
+                  aria-label="Copy scrip start"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip start</code></pre>
+            </div>
+            <p>
+              The first valid shell-command callback binds approval to
+              <strong>one conversation</strong>. All shell commands in that
+              conversation are authorized until you stop or 24 hours pass. This
+              includes writes, deletion, publishing, and network use.
+            </p>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip status --project"
+                  aria-label="Copy scrip status --project"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip status --project</code></pre>
+            </div>
+            <p>
+              Check whether authorization is active, which conversation it is
+              bound to, and when it expires. “Active” alone does not prove that
+              the agent has delivered an event.
+            </p>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip stop"
+                  aria-label="Copy scrip stop"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip stop</code></pre>
+            </div>
+            <p>
+              Future Scrip approvals stop immediately. Running commands and
+              approvals already returned cannot be recalled. To switch
+              conversations, stop, then start before continuing the intended
+              conversation. Starting again while active preserves the existing
+              binding.
+            </p>
+            <p>
+              Questions still need your answer. Native Ask/Deny rules still
+              apply. This authorization is not an OS sandbox.
+            </p>
+          </section>
+          <section id="optional">
+            <p class="eyebrow">OPTIONAL / EXACT MODE</p>
+            <h2>Prefer a command list?</h2>
+            <p>Review and apply setup with the exact commands you want:</p>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip setup --allow-command &#x27;git status&#x27; --apply"
+                  aria-label="Copy scrip setup --allow-command &#x27;git status&#x27; --apply"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip setup --allow-command &#x27;git status&#x27; --apply</code></pre>
+            </div>
+            <div class="code-block">
+              <div class="code-heading">
+                <span>PowerShell</span
+                ><button
+                  type="button"
+                  class="copy"
+                  data-copy="scrip start --exact"
+                  aria-label="Copy scrip start --exact"
+                >
+                  Copy
+                </button>
+              </div>
+              <pre><code>scrip start --exact</code></pre>
+            </div>
+            <p>
+              Repeat <code>--allow-command</code> to configure additional exact
+              commands. A different command or working directory won’t receive
+              exact-mode approval. The default
+              <code>scrip start</code> continues to select conversation mode.
+            </p>
+          </section>
+          <section id="remove">
+            <p class="eyebrow">MAINTENANCE</p>
+            <h2>Update or remove Scrip.</h2>
+            <p>
+              Install a new version over Scrip Terminal to update. There is no
+              silent updater. Existing project setup and private history are
+              preserved.
+            </p>
+            <p>
+              Before uninstalling, run <code>scrip stop</code> in each
+              configured project. Remove only
+              <code>scrip-project-commands</code> through Antigravity’s
+              documented hook settings, preserving your other hooks. Uninstall
+              Scrip Terminal from Windows Settings → Apps.
+            </p>
+            <p>
+              Private state remains under
+              <code>%LOCALAPPDATA%\Scrip\projects</code>. Back up anything you
+              need before manually removing it.
+            </p>
+            <a class="text-link" href="support.html"
+              >Need help? Read troubleshooting ↗</a
+            >
+          </section>
         </div>
-      </section>
-      <section class="guide-step">
-        <span class="step-number">02</span>
-        <div>
-          <h2>Connect a Claude Code workspace.</h2>
-          <p>
-            In <strong>Connections</strong>, choose
-            <strong>Connect Claude Code workspace</strong> and select your
-            project folder. Choose Notifications mode for visibility with native
-            permissions unchanged, or Rules mode to use exact approval rules.
-          </p>
-          <p>
-            Review the configuration, then choose
-            <strong>Connect workspace</strong>. Scrip adds its documented hooks
-            to that project's Claude Code settings, preserves other settings,
-            and makes a backup. Connection setup never changes IDE application
-            files.
-          </p>
-          <p>
-            Start a new Claude Code session in the project so the host loads the
-            hooks. "Configured" means the configuration is present; the Sessions
-            tab shows activity only after real events arrive.
-          </p>
-        </div>
-      </section>
-      <section class="guide-step">
-        <span class="step-number">03</span>
-        <div>
-          <h2>Work from your inbox.</h2>
-          <p>
-            Keep Scrip open or in its tray. Structured questions and approval
-            requests appear with their full details. Answer questions and
-            resolve current permission prompts in Claude Code. Dismiss locally
-            clears an inbox item without sending an answer.
-          </p>
-          <p>
-            In Rules mode, select a pending approval request and choose
-            <strong>Create exact approval rule</strong>. Review the tool and
-            complete arguments before saving. The rule applies to future exact
-            matches in that workspace and expires after 24 hours. It does not
-            approve the current native prompt. Pause rules from the toolbar or
-            remove them from the Rules tab.
-          </p>
-        </div>
-      </section>
-      <section class="guide-step">
-        <span class="step-number">04</span>
-        <div>
-          <h2>Stay connected on your terms.</h2>
-          <p>
-            Closing the window keeps Scrip in its tray when a tray is available.
-            Choose Quit to stop its local connection. Host permissions remain
-            with the agent when Scrip is unavailable.
-          </p>
-          <p>
-            Use Connections to disconnect a workspace before uninstalling. This
-            removes Scrip's saved hook entries while preserving other hooks and
-            settings. Uninstall from Windows Settings &rarr; Apps. Private Scrip
-            history is retained separately under your user profile.
-          </p>
-        </div>
-      </section>
-      <section class="guide-note">
-        <h2>Current availability</h2>
-        <p>
-          The installable build is Windows x64 with a guided Claude Code
-          workspace connection. You still need Claude Code and an active
-          session. Other agents, native macOS/Linux installers, mobile, and
-          remote controls are not included. Live host-version and
-          OS-notification certification are still in progress.
-        </p>
-        <p>
-          If no events appear, check the workspace connection status, restart
-          the agent session, and confirm Scrip is running. Managed host settings
-          can disable hooks. Do not disable your host's protections to force a
-          connection.
-        </p>
-        <p>
-          Updates are downloaded and installed manually. There is no silent
-          updater. For developers, the
-          <a href="downloads/__SCRIP_WHEEL__">Python package</a> is also
-          available; it is not required by the Windows installer.
-        </p>
-      </section>
+      </div>
     </main>
     <footer class="footer wrap">
-      <span>&copy; 2026 Scrip</span>
       <div>
-        <a href="quickstart.html">Getting started</a
-        ><a href="privacy.html">Privacy</a
-        ><a href="downloads/SHA256SUMS">Checksums</a
-        ><a href="release.json">Release details</a>
+        <a href="./" class="footer-name">Scrip</a>
+        <p>A little room to keep moving.</p>
+        <small>© 2026 Anwar Dev</small>
       </div>
+      <nav aria-label="Footer navigation">
+        <a href="quickstart.html">Get started</a
+        ><a href="support.html">Support & compatibility</a
+        ><a href="releases.html">Releases</a><a href="privacy.html">Privacy</a
+        ><a href="security.html">Security</a
+        ><a href="downloads/SHA256SUMS">Checksums</a>
+      </nav>
     </footer>
+    <div class="copy-status" role="status" aria-live="polite"></div>
+    <script src="site.js" defer></script>
   </body>
 </html>

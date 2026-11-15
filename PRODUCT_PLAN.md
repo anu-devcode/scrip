@@ -9,7 +9,7 @@ pricing, retention, and time savings remain unvalidated.
 
 The repository contains one Python product: typed events, deterministic policy decisions,
 application orchestration separated from storage/HTTP, SQLite migrations and durable state,
-an authenticated local service, CLI, and two documented-hook adapters. Adapter protocol and
+an authenticated local service, CLI, and three documented-hook adapters. Adapter protocol and
 local process tests exist. An optional Qt desktop inbox, background worker, and tray consumer
 are implemented with offscreen regression tests. Live host and native OS alert certification
 remain outstanding.
@@ -57,7 +57,17 @@ model, app, or remote-workspace compatibility claim is justified by this core.
 ## Next product deliverable
 
 Windows x64 packaging and the Azure download site are delivered. The desktop includes
-delivery diagnostics and explicit retry for failed alerts about pending requests. Next,
+delivery diagnostics and explicit retry for failed alerts about pending requests. The development
+tree adds guided local Cursor setup alongside Claude Code, explicit shell/MCP policy mapping,
+and one transaction per desktop snapshot. These additions are not in the published v0.2.1 installer.
+Next,
 validate OS alerts in isolated graphical sessions and certify live adapter behavior with
 documented versions. Retention controls, publisher signing, and a monitored private security
 disclosure route remain outstanding. Keep the core usable through the CLI and local API.
+
+Complete this local multi-host slice before adding more hosts: validate Cursor in a disposable
+desktop workspace, check permission failures and clean disconnect, then publish a checked
+installer. Evaluate Codex and Gemini CLI separately against their documented native interfaces;
+VS Code is an editor host, so its agent extensions need individual capability checks. Remote/WSL,
+cloud, mobile, and token optimization need separate designs and evidence. Reduced database work
+and dropped tool outputs are local efficiency improvements, not model-token optimization.

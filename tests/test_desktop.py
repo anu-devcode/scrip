@@ -14,7 +14,6 @@ pytest.importorskip("PySide6")
 from PySide6.QtCore import Qt  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
-from scrip_core.desktop.presentation import DesktopSnapshot  # noqa: E402
 from scrip_core.desktop.window import InboxWindow  # noqa: E402
 from scrip_core.desktop.worker import DesktopWorker, TraySink  # noqa: E402
 
@@ -57,12 +56,26 @@ def finish_on_gui(qapp, future):
 
 
 def snapshot(companion):
-    return DesktopSnapshot(
-        companion.status(),
-        tuple(companion.inbox()),
-        tuple(companion.sessions()),
-        notifications=tuple(companion.notifications()),
-    )
+    return companion.snapshot()
+
+
+def test_connection_refresh_preserves_host_identity_and_clears_removed_selection(qapp):
+    from scrip_core.connections import ConnectionStatus
+    from scrip_core.desktop.connections import ConnectionsPanel
+
+    panel = ConnectionsPanel()
+    claude = ConnectionStatus("same-workspace", "claude-code", "observe", "Configured")
+    cursor = ConnectionStatus("same-workspace", "cursor", "enforce", "Configured")
+    panel.show_connections([claude, cursor])
+    panel.table.selectRow(1)
+    panel.show_connections([cursor, claude])
+    assert panel.table.currentRow() == 0
+    panel.show_connections([claude])
+    assert panel.table.currentRow() == -1
+    panel.host.setCurrentIndex(panel.host.findData("cursor"))
+    assert "shell/MCP" in panel.mode.itemText(1)
+    assert panel.guidance.textFormat() == Qt.TextFormat.PlainText
+    panel.close()
 
 
 def test_plain_text_and_stale_selection_cannot_target_the_wrong_request(

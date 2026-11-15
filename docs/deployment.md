@@ -1,4 +1,4 @@
-# Deployment and desktop releases
+# Deployment and terminal releases
 
 The production hostname is **https://scrip.anwardev.me**. DNS A record `scrip` points to
 `4.222.233.58`, the existing Anbabi Azure VM. Resolve the hostname again before infrastructure
@@ -7,17 +7,18 @@ Caddy process. Private agent events stay on the user's computer, not on Azure.
 
 ## User installation
 
-Download the Windows x64 setup file and run it. It includes Python and Qt, installs per user,
-and adds a Start menu shortcut. Opening Scrip initializes empty local state and starts its
-private authenticated loopback service. Connect a Claude Code project from Connections and
-restart the host session. No developer environment, manual service, sample data, or Scrip
-account is required. The installer is unsigned; publisher signing remains outstanding.
+Download the Scrip Terminal Windows x64 setup and run it. It includes the Python runtime,
+installs per user, and offers adding its directory to the user PATH. Restart the editor after
+installation, review `scrip setup`, then explicitly install the project hook with
+`scrip setup --apply`. Daily use is `scrip start`, `scrip status --project`, and `scrip stop`.
+See the [project guide](integrations/antigravity-project.md) for scope and removal.
+The installer is unsigned. Live Antigravity-version validation remains in progress.
 
 ## Build and release
 
 Version is defined in `src/scrip_core/__init__.py`. Update it, `uv.lock`, and
 `docs/releases/VERSION.md`, then merge a verified branch to main and push `vVERSION`.
-The Desktop release workflow reruns the Windows/Linux/macOS Python test matrix, builds and
+The Terminal release workflow reruns the Windows/Linux/macOS Python test matrix, builds and
 checks the Windows bundle on a Windows runner, compiles the per-user Inno Setup installer,
 builds Python distributions and a public static bundle, and publishes immutable release
 artifacts. Prerelease versions are marked as such; existing releases are never overwritten.
@@ -26,10 +27,9 @@ For a local Windows build:
 
 ```powershell
 uv sync --locked --extra dev --extra desktop --extra build
-uv run python -m devtools.build_windows --compiler PATH_TO_ISCC.exe
+uv run python -m devtools.build_terminal --compiler PATH_TO_ISCC.exe
 uv build
-uv run python -m devtools.capture_desktop
-uv run python -m devtools.release --output dist/release/public --commit FULL_COMMIT_SHA --screenshot dist/desktop.png --installer dist/installers/Scrip-VERSION-windows-x64-setup.exe --tag vVERSION
+uv run python -m devtools.release --output dist/release/public --commit FULL_COMMIT_SHA --installer dist/installers/Scrip-Terminal-VERSION-windows-x64-setup.exe --tag vVERSION
 ```
 
 Build requires Windows x64, Inno Setup, and the locked build extra. The pinned compiler
@@ -38,8 +38,7 @@ This signature is for the compiler; it does not sign the Scrip installer. Build 
 run only in a temporary directory and never install host settings or seed the normal app.
 
 The release contains setup EXE, wheel, source archive, website archive, and `SHA256SUMS`.
-Only explicitly allowlisted website files, branding, a screenshot of the actual empty
-connection screen, wheel, installer, and release metadata are public. Tokens, databases,
+Only explicitly allowlisted website files, branding, wheel, terminal installer, and release metadata are public. Tokens, databases,
 SSH keys, repository metadata, private files, and test fixtures are not copied. `release.json`
 records source commit, installer platform, signature status, artifact sizes, and hashes.
 Checksums verify integrity; they are not signed provenance.
@@ -58,7 +57,7 @@ Monitor actual memory, egress, disk use, and download traffic before choosing mo
 
 Signing the Windows installer and future updates requires a publisher-signing identity.
 Live host-version and native OS-notification certification remain outstanding. The shipped
-installer targets Windows x64 and guided Claude Code setup; other hosts/platforms, mobile,
+terminal installer targets Windows x64 and Antigravity command hooks; other hosts/platforms, mobile,
 remote control, shipping workflows, and token optimization are separate product work.
 
 ## Shared Azure VM

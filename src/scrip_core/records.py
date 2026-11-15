@@ -1,10 +1,11 @@
 """Read and delivery contracts. Database rows never escape the persistence layer."""
 
+from dataclasses import dataclass
 from typing import Annotated, Literal
 
 from pydantic import Field
 
-from .models import Contract, Event, IngestResult, InputRequested, ToolRequested
+from .models import Contract, Event, IngestResult, InputRequested, Rule, ToolRequested
 
 
 class SessionRecord(Contract):
@@ -62,3 +63,12 @@ class DeliveryReport(Contract):
     delivered: int = 0
     failed: int = 0
     deferred: int = 0
+
+
+@dataclass(frozen=True)
+class CoreSnapshot:
+    status: CoreStatus
+    requests: tuple[RequestRecord, ...]
+    sessions: tuple[SessionRecord, ...]
+    rules: tuple[Rule, ...] = ()
+    notifications: tuple[NotificationRecord, ...] = ()

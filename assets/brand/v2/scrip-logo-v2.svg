@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 200" role="img" aria-label="scrip">
+  <title>scrip</title>
+  <g transform="translate(4 -2) scale(.8)" fill="none">
+    <path id="symbol-scrip-flow" fill="#80DFBF" fill-rule="evenodd" d="M172 24H104C62 24 34 50 34 86C34 116 54 134 89 143L153 160C167 164 174 170 174 179C174 191 163 199 147 199H69L43 231H148C190 231 220 206 220 170C220 139 199 123 165 114L103 97C90 93 83 87 83 78C83 66 94 58 110 58H188L214 24Z M112 119C115.314 119 118 121.686 118 125V137C118 140.314 115.314 143 112 143C108.686 143 106 140.314 106 137V125C106 121.686 108.686 119 112 119Z M150 119C153.314 119 156 121.686 156 125V137C156 140.314 153.314 143 150 143C146.686 143 144 140.314 144 137V125C144 121.686 146.686 119 150 119Z" />
+  </g>
+  <g transform="translate(96 3) scale(1.13)" fill="none">
+    <g id="word-lettering" stroke="#101619" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+      <path id="word-letter-c" d="M162 49C149 35 126 35 113 48C98 63 99 89 115 103C129 116 151 115 164 101" />
+      <path id="word-letter-r" d="M195 108V43M195 65C204 44 219 36 237 45" />
+      <path id="word-letter-i" d="M266 46V108" />
+      <path id="word-letter-p" d="M310 143V43M310 56C326 36 353 35 368 49C384 64 383 89 368 102C351 116 326 112 310 97" />
+    </g>
+    <rect id="word-i-dot" x="259" y="15" width="14" height="14" rx="7" fill="#101619" />
+  </g>
+</svg>
