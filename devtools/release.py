@@ -28,6 +28,7 @@ WEB_FILES = (
     "404.html",
     "styles.css",
     "robots.txt",
+    "analytics-preferences.js",
 )
 ASSETS = {
     "wordmark.svg": "v2/scrip-logo-dark-v2.svg",

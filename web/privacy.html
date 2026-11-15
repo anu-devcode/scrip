@@ -24,6 +24,11 @@
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
     <title>Privacy — Scrip</title>
+    <script
+      defer
+      src="https://www.anwarhussen.tech/insights-v2.js"
+      data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"
+    ></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
@@ -82,15 +87,30 @@
         <section>
           <h2>This website</h2>
           <p>
-            The site provides product pages and downloadable files. It has no
-            analytics scripts, advertising trackers, sign-up forms, or
-            application cookies. Copy buttons use your browser clipboard only
-            when clicked.
+            The site provides product pages and downloads. The home, setup, and
+            privacy pages use visit and download statistics from
+            anwarhussen.tech. Random browser identifiers measure visits. The
+            analytics integration respects Do Not Track and Global Privacy
+            Control. Local agent events, project files, approval rules, and
+            credentials are excluded from website analytics. Copy buttons use
+            the clipboard when clicked.
           </p>
           <p>
             Hosting infrastructure processes connection information such as IP
             addresses and request metadata to serve the website and downloads.
             Your agent and third-party services have their own data practices.
+          </p>
+          <p>
+            <button
+              type="button"
+              class="preference-button"
+              data-analytics-optout
+            >
+              Turn off visit statistics
+            </button>
+          </p>
+          <p class="fine-print">
+            This preference is saved in this browser’s local storage.
           </p>
         </section>
         <section>
@@ -127,5 +147,6 @@
     </footer>
     <div class="copy-status" role="status" aria-live="polite"></div>
     <script src="site.js" defer></script>
+    <script defer src="analytics-preferences.js"></script>
   </body>
 </html>

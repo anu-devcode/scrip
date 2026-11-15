@@ -1,0 +1,25 @@
+(function () {
+  var button = document.querySelector("[data-analytics-optout]");
+  if (!button) return;
+  function disabled() {
+    try {
+      return localStorage.getItem("siteMetrics.disabled") === "true";
+    } catch (_) {
+      return false;
+    }
+  }
+  function render() {
+    button.textContent = disabled()
+      ? "Turn on visit statistics"
+      : "Turn off visit statistics";
+  }
+  button.addEventListener("click", function () {
+    var off = !disabled();
+    try {
+      localStorage.setItem("siteMetrics.disabled", String(off));
+    } catch (_) {}
+    if (window.siteMetrics) window.siteMetrics.optOut(off);
+    render();
+  });
+  render();
+})();

@@ -1017,3 +1017,15 @@ tr:last-child td {
   color: var(--muted);
   margin-block: 16px;
 }
+
+.preference-button {
+  border: 1px solid #557b65;
+  background: var(--panel);
+  color: var(--mint);
+  padding: 12px 18px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.preference-button:hover {
+  border-color: var(--mint);
+}
