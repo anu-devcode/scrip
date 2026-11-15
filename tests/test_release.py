@@ -143,6 +143,7 @@ def test_real_site_has_working_local_links_and_no_inline_scripts(tmp_path, relea
     assert all(f'id="word-letter-{letter}"' in logo for letter in "crip")
     index = (public / "index.html").read_text(encoding="utf-8")
     assert "https://github.com/anu-devcode/scrip#readme" in index
+    assert "Start and stop Antigravity command approvals from your terminal." in index
     assert "scrip setup --apply" in index
     assert "scrip start" in index and "scrip stop" in index
     assert "<nav" not in index and "<script" not in index
