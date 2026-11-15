@@ -43,10 +43,17 @@ SSH keys, repository metadata, private files, and test fixtures are not copied. 
 records source commit, installer platform, signature status, artifact sizes, and hashes.
 Checksums verify integrity; they are not signed provenance.
 
-The repository remains private. The production site hosts downloads directly so people do
-not need GitHub access. The previous hosted developer-preview distribution is retired when
-the Azure site is verified. Its non-secret Site identity remains in `deploy/sites/hosting.json`
-for ownership records, not as a second user-facing install channel.
+The repository is public and MIT licensed at https://github.com/anu-devcode/scrip.
+The public site is a minimal download and command-reference page. The previous expanded
+website is preserved under `web/expanded/` and excluded from the public bundle, together
+with its animation, analytics scripts, and additional guidance pages. The release builder's
+explicit `WEB_FILES` and `ASSETS` lists select the published content. Restore the expanded
+sources and their allowlist deliberately when those product pages are needed again.
+
+Website-only changes can reuse the verified installer and wheel from the existing GitHub
+release. Build with the new website source commit and publish to a new immutable release
+directory. The tool version and existing download bytes stay tied to the original release.
+Do not replace assets in an existing GitHub release.
 
 ## Capacity and remaining release gates
 
