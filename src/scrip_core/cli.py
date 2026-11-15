@@ -5,7 +5,7 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from . import __version__, commands
+from . import __version__, commands, project
 from .adapters.registry import adapter_names
 from .errors import StorageError
 from .hooks import run_hook
@@ -17,6 +17,29 @@ def parser() -> argparse.ArgumentParser:
     root.add_argument("--version", action="version", version=f"Scrip core {__version__}")
     root.add_argument("--data-dir", type=Path, default=default_data_dir())
     subcommands = root.add_subparsers(dest="command", required=True)
+    setup = subcommands.add_parser("setup", help="Review one-time Antigravity project setup")
+    setup.add_argument(
+        "--allow-command",
+        action="append",
+        default=[],
+        help="Exact command to authorize; repeatable",
+    )
+    setup.add_argument(
+        "--apply", action="store_true", help="Explicitly approve writing project hooks"
+    )
+    setup.set_defaults(handler=project.command)
+    for name in ("start", "stop"):
+        toggle = subcommands.add_parser(name, help=f"{name.title()} this project's approvals")
+        if name == "start":
+            toggle.add_argument(
+                "--exact",
+                action="store_true",
+                help="Use saved exact-command rules instead of all commands in one conversation",
+            )
+        toggle.set_defaults(handler=project.command)
+    project_hook = subcommands.add_parser("project-hook", help=argparse.SUPPRESS)
+    project_hook.add_argument("--context", required=True)
+    project_hook.add_argument("--installation-id", required=True)
     schema = subcommands.add_parser("schema", help="Export the versioned event contract")
     schema.add_argument("--output", type=Path)
     schema.set_defaults(handler=commands.schema)
@@ -27,6 +50,10 @@ def parser() -> argparse.ArgumentParser:
     for name in ("status", "sessions", "inbox", "history", "acknowledge"):
         command = subcommands.add_parser(name)
         command.set_defaults(handler=commands.query)
+        if name == "status":
+            command.add_argument(
+                "--project", action="store_true", help="Show local project approval status"
+            )
         if name == "history":
             command.add_argument("--limit", type=int, default=20)
         elif name == "acknowledge":
@@ -62,6 +89,11 @@ def parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = parser().parse_args()
     try:
+        if args.command == "project-hook":
+            return project.run_project_hook(args.context, args.installation_id)
+        if args.command == "status" and args.project:
+            commands.output(project.status(Path.cwd(), args.data_dir))
+            return 0
         if args.command == "hook":
             return run_hook(args.adapter, args.event, args.mode, args.data_dir.resolve())
         handler: Callable[[argparse.Namespace], None] = args.handler

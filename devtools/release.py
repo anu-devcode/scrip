@@ -1,4 +1,4 @@
-"""Prepare an allowlisted public website and versioned desktop download bundle."""
+"""Prepare an allowlisted public website and versioned terminal download bundle."""
 
 import argparse
 import hashlib
@@ -20,15 +20,20 @@ WEB_FILES = (
     "index.html",
     "quickstart.html",
     "privacy.html",
+    "support.html",
+    "security.html",
+    "releases.html",
+    "site.js",
+    "sitemap.xml",
     "404.html",
     "styles.css",
     "robots.txt",
     "analytics-preferences.js",
 )
 ASSETS = {
-    "wordmark.svg": "scrip-wordmark-white-v1.svg",
-    "symbol.svg": "scrip-symbol-mint-v1.svg",
+    "wordmark.svg": "v2/scrip-logo-dark-v2.svg",
     "mascot.png": "scrip-mascot-reference-v1.png",
+    "mascot.gif": "motion/scrip-mascot-idle.gif",
     "icon.png": "icons/scrip-icon-128.png",
 }
 
@@ -69,7 +74,6 @@ def build_public_site(
     wheel: Path,
     destination: Path,
     commit: str,
-    screenshot: Path,
     *,
     installer: Path,
     source: Path = ROOT,
@@ -79,7 +83,7 @@ def build_public_site(
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("A full lowercase source commit SHA is required")
     validate_wheel(wheel, version)
-    expected_installer = f"Scrip-{version}-windows-x64-setup.exe"
+    expected_installer = f"Scrip-Terminal-{version}-windows-x64-setup.exe"
     if installer.name != expected_installer or installer.is_symlink() or not installer.is_file():
         raise ValueError(f"Expected a regular {expected_installer} installer")
     with installer.open("rb") as stream:
@@ -89,7 +93,6 @@ def build_public_site(
         raise ValueError("Output directory already exists; choose a new release staging directory")
     for path in [
         *(source / "web" / name for name in WEB_FILES),
-        screenshot,
         *(source / "assets/brand" / name for name in ASSETS.values()),
     ]:
         if path.is_symlink() or not path.is_file():
@@ -117,7 +120,6 @@ def build_public_site(
         (destination / name).write_text(content, encoding="utf-8", newline="\n")
     for name, original in ASSETS.items():
         shutil.copyfile(source / "assets/brand" / original, assets / name)
-    shutil.copyfile(screenshot, assets / "inbox.png")
     shutil.copyfile(wheel, downloads / wheel.name)
     shutil.copyfile(installer, downloads / installer.name)
     (downloads / "SHA256SUMS").write_text(
@@ -194,7 +196,6 @@ def main() -> None:
     )
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--commit", required=True)
-    parser.add_argument("--screenshot", type=Path, required=True)
     parser.add_argument("--installer", type=Path, required=True)
     parser.add_argument("--tag")
     args = parser.parse_args()
@@ -204,7 +205,6 @@ def main() -> None:
         args.wheel.resolve(),
         args.output.resolve(),
         args.commit,
-        args.screenshot.resolve(),
         installer=args.installer.resolve(),
     )
     bundle = site.parent / f"scrip-web-{__version__}.tar.gz"

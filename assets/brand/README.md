@@ -1,5 +1,10 @@
 # Scrip identity — S-loop robot, v1
 
+The [v2 S logo](v2/README.md) is for product branding and logo placements. The original
+mint robot below remains the mascot for the homepage artwork and character animation.
+The two assets have distinct roles; do not substitute the S logo for the robot. Robot
+animation assets and instructions live in [motion/](motion/README.md).
+
 ![Scrip identity presentation](scrip-brand-board-v1.png)
 
 An S-shaped working companion for the complete product loop: building, coordinating,

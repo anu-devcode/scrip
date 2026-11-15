@@ -6,233 +6,375 @@
     <meta name="theme-color" content="#101619" />
     <meta
       name="description"
-      content="Scrip brings agent questions, requests, and exact approval rules into one local desktop companion."
+      content="Start session command approvals from your project terminal. Stop when you choose. A local Windows companion for Antigravity."
     />
+    <link rel="canonical" href="https://scrip.anwardev.me/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Scrip — Let the session flow." />
+    <meta
+      property="og:description"
+      content="Start session command approvals from your project terminal. Stop when you choose. A local Windows companion for Antigravity."
+    />
+    <meta property="og:url" content="https://scrip.anwardev.me/" />
+    <meta
+      property="og:image"
+      content="https://scrip.anwardev.me/assets/mascot.png"
+    />
+    <meta name="twitter:card" content="summary" />
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
-    <title>Scrip &#8212; Keep your agents moving</title>
-    <script defer src="https://www.anwarhussen.tech/insights-v2.js" data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"></script>
+    <title>Scrip — Let the session flow.</title>
+    <script
+      defer
+      src="https://www.anwarhussen.tech/insights-v2.js"
+      data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"
+    ></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="header wrap">
       <a class="brand" href="./" aria-label="Scrip home"
-        ><img src="assets/wordmark.svg" alt="scrip" width="112" height="42"
+        ><img src="assets/wordmark.svg" width="144" height="52" alt="scrip"
       /></a>
       <nav aria-label="Main navigation">
-        <a href="./#how">How it works</a
-        ><a href="quickstart.html" class="nav-action">Download Scrip &#8599;</a>
+        <a href="./#how">How it works</a><a href="support.html">Support</a
+        ><a href="quickstart.html" class="nav-download"
+          >Get Scrip <span aria-hidden="true">↗</span></a
+        >
       </nav>
     </header>
     <main id="main">
       <section class="hero wrap">
         <div class="hero-copy">
-          <p class="eyebrow">YOUR WORK, IN THE LOOP</p>
-          <h1>Keep building.<br /><em>Stay in control.</em></h1>
+          <a href="releases.html" class="release-pill"
+            ><span class="dot"></span> Scrip Terminal __SCRIP_VERSION__
+            <span aria-hidden="true">↗</span></a
+          >
+          <p class="eyebrow">SESSION COMMAND APPROVAL</p>
+          <h1>One session.<br />Keep <em>moving.</em></h1>
           <p class="lead">
-            Your agents keep working. Scrip keeps their questions, requests, and
-            approval rules in view, right on your desktop.
+            Give your agent room to run commands through a conversation. Start
+            from your project terminal. Stop whenever you choose.
           </p>
-          <div class="hero-actions">
+          <div class="actions">
             <a
               class="button primary"
+              data-analytics-event="download_open"
               href="downloads/__SCRIP_INSTALLER__"
               download
-              >Download for Windows <span aria-hidden="true">&#8595;</span></a
+              >Download for Windows <span aria-hidden="true">↓</span></a
             ><a class="text-link" href="quickstart.html"
-              >Getting started &#8599;</a
+              >Read the setup guide <span aria-hidden="true">↗</span></a
             >
           </div>
-          <p class="fine-print">
-            Windows 10/11 &middot; 64-bit &middot; Version __SCRIP_VERSION__
-            &middot; __SCRIP_INSTALLER_SIZE__<br />Python and desktop
-            dependencies included. No terminal setup.
+          <p class="install-note">
+            Windows x64 · Antigravity command hooks · Free local download
+          </p>
+          <p class="release-note">
+            Early release. Native host rules apply.
+            <a href="support.html">Check compatibility before installing.</a>
           </p>
         </div>
         <div class="hero-art">
-          <img
-            src="assets/mascot.png"
-            alt="Scrip's mint robot companion"
-            width="1280"
-            height="1280"
-            fetchpriority="high"
+          <input
+            class="motion-toggle"
+            type="checkbox"
+            id="pause-mascot"
+            aria-label="Pause mascot animation"
           />
-          <div class="art-caption">
-            <span>BUILT TO KEEP YOU IN FLOW</span><span>01 &#8212; SCRIP</span>
+          <picture class="companion-motion">
+            <source
+              media="(prefers-reduced-motion: reduce)"
+              srcset="assets/mascot.png"
+            />
+            <img
+              src="assets/mascot.gif"
+              width="560"
+              height="560"
+              alt="Scrip’s mint robot companion, blinking and looking around"
+            />
+          </picture>
+          <img
+            class="companion-still"
+            src="assets/mascot.png"
+            width="560"
+            height="560"
+            alt="Scrip’s mint robot companion"
+          />
+          <label class="motion-control" for="pause-mascot"
+            ><span class="motion-running">Pause motion Ⅱ</span
+            ><span class="motion-paused">Play motion ▷</span></label
+          >
+          <div class="hero-command">
+            <span class="prompt" aria-hidden="true">&gt;</span
+            ><code>scrip start</code
+            ><span class="command-caption">Start / stop</span>
           </div>
         </div>
       </section>
-      <div class="principles wrap">
-        <span>Local by design</span><span>Rules you define</span
-        ><span>Questions stay human</span><span>One working context</span>
+      <div class="trust-strip wrap">
+        <span>Runs on your computer</span><span>No Scrip account</span
+        ><span>No model API key</span><span>Questions stay with you</span>
       </div>
-      <section id="how" class="section wrap">
+      <section class="section wrap" id="how">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">A SHORTER PATH TO WORK</p>
-            <h2>Install. Connect.<br />Keep building.</h2>
+            <p class="eyebrow">HOW IT WORKS</p>
+            <h2>A small command.<br />A clearer workflow.</h2>
           </div>
           <p>
-            Open Scrip, connect your Claude Code workspace, and start a new
-            agent session. Your inbox fills from real activity. No sample
-            projects or preloaded conversations.
+            Connect the project once through Antigravity’s documented hooks.
+            After that, the daily routine is two commands.
           </p>
         </div>
-        <div class="feature-grid">
-          <article class="feature">
-            <span class="feature-number">01 / CONNECT</span>
-            <h3>One setup.<br />Your workspace.</h3>
+        <div class="workflow">
+          <article>
+            <span class="step-number">CONNECT ONCE</span>
+            <h3>Make it your project.</h3>
             <p>
-              The Windows installer includes everything Scrip needs. Choose your
-              project in Connections and review its hook configuration before
-              saving.
+              Review the proposed hook configuration, then explicitly apply it.
+              Existing hooks are preserved and backed up.
             </p>
+            <code class="inline-command">scrip setup --apply</code>
           </article>
-          <article class="feature">
-            <span class="feature-number">02 / NOTICE</span>
-            <h3>Know when<br />you're needed.</h3>
+          <article>
+            <span class="step-number">START YOUR SESSION</span>
+            <h3>Give it the go-ahead.</h3>
             <p>
-              Read structured questions and permission requests with their
-              workspace and full details. Get desktop notifications when your
-              operating system permits them.
+              Authorize shell commands in one conversation. The first valid
+              command binds it to that conversation and project.
             </p>
+            <code class="inline-command">scrip start</code>
           </article>
-          <article class="feature">
-            <span class="feature-number">03 / CONTROL</span>
-            <h3>Exact rules.<br />Clear limits.</h3>
+          <article>
+            <span class="step-number">STOP WHEN YOU CHOOSE</span>
+            <h3>Stop on your terms.</h3>
             <p>
-              Save a reviewed approval rule for an exact action for 24 hours.
-              Pause rules or remove them whenever you need. Answer questions in
-              your agent.
+              Revoke future Scrip approvals. Already-running commands continue.
+              Authorization also expires after 24 hours.
             </p>
+            <code class="inline-command">scrip stop</code>
           </article>
         </div>
       </section>
-      <section class="showcase wrap">
-        <div class="showcase-copy">
-          <p class="eyebrow">YOUR DESKTOP COMPANION</p>
-          <h2>Your agents,<br />in view.</h2>
-          <p>
-            Start from an empty inbox. Connect a project deliberately, then see
-            real sessions and requests as they arrive. Scrip stays in your tray
-            when you close its window.
+      <section class="control-section">
+        <div class="wrap control-grid">
+          <div>
+            <p class="eyebrow">KNOW WHAT YOU’RE STARTING</p>
+            <h2>One conversation.<br />Clear boundaries.</h2>
+            <p class="control-lead">
+              Session approval includes every shell command in that
+              conversation. Use it with a project and agent you trust.
+            </p>
+            <a class="text-link" href="security.html"
+              >Understand the controls ↗</a
+            >
+          </div>
+          <div class="boundary-list">
+            <div>
+              <span class="boundary-icon" aria-hidden="true">↳</span>
+              <div>
+                <h3>Bound to a conversation</h3>
+                <p>
+                  Another conversation or project doesn’t inherit Scrip’s
+                  session authorization.
+                </p>
+              </div>
+            </div>
+            <div>
+              <span class="boundary-icon" aria-hidden="true">?</span>
+              <div>
+                <h3>Your judgment stays yours</h3>
+                <p>
+                  Questions still need your answer. Native Ask and Deny rules
+                  remain in force.
+                </p>
+              </div>
+            </div>
+            <div>
+              <span class="boundary-icon" aria-hidden="true">!</span>
+              <div>
+                <h3>Command approval is powerful</h3>
+                <p>
+                  It can include writes, deletion, publishing, and network
+                  access. A project directory is not a sandbox.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section wrap terminal-section">
+        <div>
+          <p class="eyebrow">RIGHT WHERE YOU WORK</p>
+          <h2>Open a terminal.<br />Find your rhythm.</h2>
+          <p class="muted">
+            No separate dashboard or service to keep running. Use the terminal
+            in your editor, or your usual shell.
+          </p>
+          <p class="fine-print">
+            The terminal command can run in any editor. Approval integration in
+            this release is specific to Antigravity.
           </p>
           <a class="text-link" href="quickstart.html"
-            >Set up your first connection &#8599;</a
+            >Install → connect → start ↗</a
           >
         </div>
-        <figure>
-          <img
-            src="assets/inbox.png"
-            alt="Scrip's Connections screen on a fresh installation, with no sample sessions"
-            width="1120"
-            height="760"
-            loading="lazy"
-          />
-          <figcaption>
-            The actual first-run connection screen. No seeded activity.
-          </figcaption>
-        </figure>
-      </section>
-      <section class="section wrap integration">
-        <p class="eyebrow">CONNECTIONS IN THIS RELEASE</p>
-        <h2>Works through<br />documented interfaces.</h2>
-        <div class="integration-row">
-          <div>
-            <h3>Claude Code</h3>
-            <p>
-              Guided workspace connection, structured questions, session
-              visibility, and exact permission rules. Available in whichever
-              editor you use to run Claude Code.
-            </p>
+        <div class="terminal-reference">
+          <div class="terminal-title">
+            <span class="terminal-dots" aria-hidden="true">● ● ●</span
+            ><span>Daily commands</span>
           </div>
-          <span class="badge">Guided setup</span>
+          <div class="code-block">
+            <div class="code-heading">
+              <span>Start conversation approval</span
+              ><button
+                type="button"
+                class="copy"
+                data-copy="scrip start"
+                aria-label="Copy scrip start"
+              >
+                Copy
+              </button>
+            </div>
+            <pre><code>scrip start</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-heading">
+              <span>Check scope and binding</span
+              ><button
+                type="button"
+                class="copy"
+                data-copy="scrip status --project"
+                aria-label="Copy scrip status --project"
+              >
+                Copy
+              </button>
+            </div>
+            <pre><code>scrip status --project</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-heading">
+              <span>Stop future approvals</span
+              ><button
+                type="button"
+                class="copy"
+                data-copy="scrip stop"
+                aria-label="Copy scrip stop"
+              >
+                Copy
+              </button>
+            </div>
+            <pre><code>scrip stop</code></pre>
+          </div>
+          <p class="terminal-footnote">
+            These commands work in your project terminal.
+          </p>
         </div>
-        <div class="integration-row">
+      </section>
+      <section class="section wrap support-summary" id="compatibility">
+        <div class="section-heading">
           <div>
-            <h3>More hosts and platforms</h3>
-            <p>
-              Other agents need their own supported integration. Native
-              macOS/Linux installers, mobile access, shipping workflows, and
-              token tools are still being built.
-            </p>
+            <p class="eyebrow">A FOCUSED FIRST RELEASE</p>
+            <h2>Here’s what’s available.</h2>
           </div>
-          <span class="badge">In development</span>
+          <a class="text-link" href="support.html"
+            >Full compatibility notes ↗</a
+          >
+        </div>
+        <div class="support-row">
+          <div>
+            <h3>Windows 10 & 11, x64</h3>
+            <p>Bundled runtime. No separate Python install.</p>
+          </div>
+          <span class="badge">Installable</span>
+        </div>
+        <div class="support-row">
+          <div>
+            <h3>Antigravity command hooks</h3>
+            <p>One project, one conversation, shell commands.</p>
+          </div>
+          <span class="badge subdued">Live validation in progress</span>
         </div>
         <p class="fine-print">
-          The connection protocol and installed local transport are tested. Live
-          agent-version certification remains outstanding; Scrip does not
-          promise support for every agent, IDE, or version. It never modifies
-          IDE application files.
+          This release does not promise universal IDE or agent compatibility.
+          The installer is unsigned. See the setup and security notes before you
+          begin.
         </p>
       </section>
       <section class="section wrap faq">
         <div>
-          <p class="eyebrow">BEFORE YOU DOWNLOAD</p>
-          <h2>Clear answers.</h2>
+          <p class="eyebrow">BEFORE YOU BEGIN</p>
+          <h2>A few good<br />questions.</h2>
         </div>
         <div>
           <details>
-            <summary>Do I need Python or a terminal?</summary>
+            <summary>How is this different from Turbo?</summary>
             <p>
-              No. Download the Windows setup file, run it, and open Scrip from
-              the Start menu. The installer includes Python and Qt and installs
-              for your user account.
+              Scrip gives you a project-terminal start/stop lifecycle bound to
+              one conversation. It uses Antigravity’s documented hooks and still
+              honors native Ask/Deny rules. If Turbo already meets your needs,
+              you may not need Scrip.
             </p>
           </details>
           <details>
-            <summary>Does Scrip approve every request?</summary>
+            <summary>Can it answer the agent’s questions?</summary>
             <p>
-              No. In Rules mode, only future calls matching a rule you
-              explicitly saved can be approved automatically. Other requests
-              remain subject to native review. Questions always require your
-              answer in the agent.
+              No. Session command approval covers shell execution only.
+              Questions still need your answer in the agent.
             </p>
           </details>
           <details>
-            <summary>Where does my agent data go?</summary>
+            <summary>Can I limit it to specific commands?</summary>
             <p>
-              Requests, rules, and history stay on your computer. The website
-              distributes the application; it does not receive your agent
-              events. No Scrip account or model API key is required.
+              Yes. Configure exact commands during setup and run
+              <code>scrip start --exact</code>. The default
+              <code>scrip start</code> authorizes commands throughout one
+              conversation.
             </p>
           </details>
           <details>
-            <summary>Is the Windows installer signed?</summary>
+            <summary>Does my code go to a Scrip cloud?</summary>
             <p>
-              This release is unsigned. Windows may show an unknown-publisher
-              warning. Publisher signing and signed updates are not yet
-              available. Download from this site and use the published checksum
-              to verify file integrity.
-            </p>
-          </details>
-          <details>
-            <summary>Does this include mobile or remote control?</summary>
-            <p>
-              No. This release is a local desktop companion. Mobile access,
-              remote agent control, additional host connections, and product
-              deployment automation remain future work.
+              No. Scrip stores its authorization and event history on your
+              computer. This website serves product pages and downloads. Your
+              agent and hosting providers retain their own data practices.
             </p>
           </details>
         </div>
       </section>
       <section class="closing wrap">
-        <img src="assets/symbol.svg" alt="" width="100" height="100" />
-        <h2>Make room for the work.</h2>
-        <p>Download Scrip and connect your first workspace.</p>
-        <a class="button primary" href="downloads/__SCRIP_INSTALLER__" download
-          >Download for Windows &#8595;</a
-        >
+        <p class="eyebrow">MAKE ROOM FOR THE WORK</p>
+        <h2>Let the session <em>flow.</em></h2>
+        <div class="actions">
+          <a
+            class="button primary"
+            data-analytics-event="download_open"
+            href="downloads/__SCRIP_INSTALLER__"
+            download
+            >Get Scrip Terminal <span aria-hidden="true">↓</span></a
+          ><a class="text-link" href="quickstart.html">Get started ↗</a>
+        </div>
+        <p class="install-note">
+          v__SCRIP_VERSION__ · Windows x64 · __SCRIP_INSTALLER_SIZE__
+        </p>
       </section>
     </main>
     <footer class="footer wrap">
-      <span>&copy; 2026 Scrip</span>
       <div>
-        <a href="quickstart.html">Getting started</a
-        ><a href="privacy.html">Privacy</a
-        ><a href="downloads/SHA256SUMS">Checksums</a
-        ><a href="release.json">Release details</a>
+        <a href="./" class="footer-name">Scrip</a>
+        <p>A little room to keep moving.</p>
+        <small>© 2026 Anwar Dev</small>
       </div>
+      <nav aria-label="Footer navigation">
+        <a href="quickstart.html">Get started</a
+        ><a href="support.html">Support & compatibility</a
+        ><a href="releases.html">Releases</a><a href="privacy.html">Privacy</a
+        ><a href="security.html">Security</a
+        ><a href="downloads/SHA256SUMS">Checksums</a>
+      </nav>
     </footer>
+    <div class="copy-status" role="status" aria-live="polite"></div>
+    <script src="site.js" defer></script>
   </body>
 </html>

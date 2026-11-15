@@ -1,32 +1,47 @@
 # Scrip
 
-Scrip is a local desktop companion for coding agents. It keeps structured questions,
-permission requests, sessions, and exact approval rules in one place.
+Scrip Terminal provides project-terminal start/stop controls for shell-command approval
+in one Antigravity conversation. The public Windows x64 installer is available at
+[ scrip.anwardev.me ](https://scrip.anwardev.me).
 
-## Install
+## Install and connect
 
-Download the Windows x64 setup from **https://scrip.anwardev.me**. The installer includes
-Python and Qt, adds a Start menu shortcut, and opens a clean application. No terminal or
-Python environment is required. The current installer is unsigned.
+Download **Scrip Terminal 0.4.0** and run the per-user installer. Keep the user-PATH option
+selected, then restart your editor so terminals and agent hooks inherit it. The installer
+bundles its Python runtime and is currently unsigned.
 
-Open Connections, select a Claude Code workspace, review its settings, then connect.
-Restart the agent session. Activity appears only when actual hook events arrive.
-Scrip never seeds sessions or modifies IDE application files.
+From your project root, review and explicitly apply the documented hook configuration once.
+Existing unrelated hooks are preserved and backed up.
 
-## Current scope
+```powershell
+scrip setup
+scrip setup --apply
+```
 
-- Guided Claude Code workspace setup through documented hooks, with review and backups.
-- A local inbox, session visibility, and tray notifications where supported by the OS.
-- An Alerts screen with delivery status and explicit retry for failed pending-request alerts.
-- Exact scoped approval rules with a 24-hour expiry when created in the desktop.
-- Rule pause/revocation and explicit disconnection that preserves other host settings.
-- An authenticated loopback service managed automatically by the desktop.
+## Daily use
 
-Questions and existing permission prompts are resolved in the originating agent. A saved
-rule applies to future exact matches only, in Rules mode. The host retains its own controls.
-Live host-version and native notification certification remain outstanding. Native macOS/Linux
-installers, other guided host connections, mobile, remote control, deployment automation,
-and token optimization are future work. Compatibility comes from host interfaces, not models.
+```powershell
+scrip start
+scrip status --project
+scrip stop
+```
+
+Start authorizes all shell commands in one conversation, bound to the first valid command
+callback after start. This includes writes, deletion, publishing, and network access. The
+grant expires after 24 hours. Stop revokes future Scrip approvals. Native Ask/Deny rules
+still apply, and questions require your answer. A working directory provides no OS isolation.
+Exact saved-command mode is also available through `scrip start --exact`.
+
+See the [setup guide](https://scrip.anwardev.me/quickstart.html) and
+[compatibility notes](https://scrip.anwardev.me/support.html). The terminal installer targets
+Windows x64 and Antigravity command hooks. Live host-version validation remains in progress.
+
+## Other components
+
+The Python source also contains a desktop inbox, local authenticated HTTP transport,
+notifications, and documented Claude Code/Cursor adapters. Those components have isolated
+regression coverage and separate packaging requirements. They are outside the 0.4.0
+terminal distribution. No universal IDE or agent compatibility is claimed.
 
 ## Develop
 

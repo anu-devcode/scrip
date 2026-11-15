@@ -16,12 +16,12 @@ from ..connections import (
     connection_status,
     disconnect,
     plan_connection,
+    workspace_host,
 )
 from ..errors import DeliveryDeferred
 from ..models import Rule, ToolRequested
 from ..records import NotificationRecord
 from ..service import CompanionService
-from .presentation import DesktopSnapshot
 
 
 @dataclass(frozen=True)
@@ -126,20 +126,10 @@ class DesktopWorker(QObject):
         if self.stopping.is_set():
             return
         try:
-            requests = tuple(self.service.inbox())
-            status = self.service.status()
-            sessions = tuple(self.service.sessions())
+            snapshot = self.service.snapshot()
             if self.stopping.is_set():
                 return
-            self.snapshot_ready.emit(
-                DesktopSnapshot(
-                    status,
-                    requests,
-                    sessions,
-                    tuple(self.service.rules()),
-                    tuple(self.service.notifications()),
-                )
-            )
+            self.snapshot_ready.emit(snapshot)
             if self.data_dir is not None:
                 self.connections_ready.emit(connection_status(self.data_dir))
             if self.alerts:
@@ -197,8 +187,8 @@ class DesktopWorker(QObject):
         except Exception as error:
             self.problem.emit(f"Could not change pause state ({type(error).__name__}).")
 
-    @Slot(str, str)
-    def plan_connection(self, workspace: str, mode: str) -> None:
+    @Slot(str, str, str)
+    def plan_connection(self, workspace: str, mode: str, adapter: str) -> None:
         if self.stopping.is_set() or self.data_dir is None:
             return
         try:
@@ -206,7 +196,10 @@ class DesktopWorker(QObject):
                 raise ValueError("Unknown connection mode")
             self.connection_plan.emit(
                 plan_connection(
-                    Path(workspace), self.data_dir, "enforce" if mode == "enforce" else "observe"
+                    Path(workspace),
+                    self.data_dir,
+                    "enforce" if mode == "enforce" else "observe",
+                    adapter,
                 )
             )
         except (ValueError, OSError) as error:
@@ -220,19 +213,22 @@ class DesktopWorker(QObject):
             apply_connection(plan, self.data_dir)
             self.refresh()
             self.notice.emit(
-                "Workspace configured. Start a new Claude Code session in this project."
+                f"Workspace configured. Start a new {workspace_host(plan.adapter).label} "
+                "session in this project."
             )
         except (ValueError, OSError) as error:
             self.problem.emit(str(error))
 
-    @Slot(str)
-    def disconnect_workspace(self, workspace: str) -> None:
+    @Slot(str, str)
+    def disconnect_workspace(self, workspace: str, adapter: str) -> None:
         if self.stopping.is_set() or self.data_dir is None:
             return
         try:
-            disconnect(Path(workspace), self.data_dir)
+            disconnect(Path(workspace), self.data_dir, adapter)
             self.refresh()
-            self.notice.emit("Disconnected. Restart the Claude Code session to reload its hooks.")
+            self.notice.emit(
+                f"Disconnected. Restart {workspace_host(adapter).label} to reload its hooks."
+            )
         except (ValueError, OSError) as error:
             self.problem.emit(str(error))
 

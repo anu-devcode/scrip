@@ -6,70 +6,147 @@
     <meta name="theme-color" content="#101619" />
     <meta
       name="description"
-      content="Scrip brings agent questions, requests, and exact approval rules into one local desktop companion."
+      content="How Scrip Terminal stores project authorization and event history locally, and what this website receives."
     />
+    <link rel="canonical" href="https://scrip.anwardev.me/privacy.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Privacy — Scrip" />
+    <meta
+      property="og:description"
+      content="How Scrip Terminal stores project authorization and event history locally, and what this website receives."
+    />
+    <meta property="og:url" content="https://scrip.anwardev.me/privacy.html" />
+    <meta
+      property="og:image"
+      content="https://scrip.anwardev.me/assets/mascot.png"
+    />
+    <meta name="twitter:card" content="summary" />
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
-    <title>Scrip privacy</title>
-    <script defer src="https://www.anwarhussen.tech/insights-v2.js" data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"></script>
+    <title>Privacy — Scrip</title>
+    <script
+      defer
+      src="https://www.anwarhussen.tech/insights-v2.js"
+      data-site="bf279bc9-ed7a-4f54-9cdf-d3c4af46c5f2"
+    ></script>
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
     <header class="header wrap">
       <a class="brand" href="./" aria-label="Scrip home"
-        ><img src="assets/wordmark.svg" alt="scrip" width="112" height="42"
+        ><img src="assets/wordmark.svg" width="144" height="52" alt="scrip"
       /></a>
       <nav aria-label="Main navigation">
-        <a href="./#how">How it works</a
-        ><a href="quickstart.html" class="nav-action">Download Scrip &#8599;</a>
+        <a href="./#how">How it works</a><a href="support.html">Support</a
+        ><a href="quickstart.html" class="nav-download"
+          >Get Scrip <span aria-hidden="true">↗</span></a
+        >
       </nav>
     </header>
-    <main id="main" class="guide wrap">
-      <p class="eyebrow">PRIVACY</p>
-      <h1>Your workspace.<br />Your computer.</h1>
-      <section class="guide-note">
-        <h2>The desktop application</h2>
-        <p>
-          Scrip stores agent events, questions, tool arguments, rules, workspace
-          paths, and session history locally under your operating-system user
-          profile. That information can contain private material. The current
-          app has no telemetry, cloud sync, or Scrip accounts.
+    <main id="main">
+      <div class="page-intro wrap">
+        <p class="eyebrow">PRIVACY</p>
+        <h1>Your project stays<br />on your computer.</h1>
+        <p class="lead">
+          Scrip Terminal uses local state for project configuration, command
+          authorization, and decision history. No Scrip account is required.
         </p>
-        <p>
-          Its authenticated service listens only on your computer's IPv4
-          loopback interface. Your local token is not sent to this website. Host
-          integrations send events to that local service using documented hooks.
+      </div>
+      <div class="reading wrap">
+        <section>
+          <h2>Local application data</h2>
+          <p>
+            The terminal app stores workspace paths, authorized commands,
+            conversation identifiers, tool arguments, decisions, and event
+            history under your Windows user profile. This material can contain
+            private information. Scrip has no application telemetry or cloud
+            sync.
+          </p>
+          <p>
+            The terminal approval workflow reads and writes its local SQLite
+            state directly. It does not need the older desktop app’s loopback
+            service or send agent events to this website.
+          </p>
+          <p>
+            The last-callback diagnostic records processing stage, exception
+            type, field names/types, and response category. It excludes raw
+            command values, transcript content, and exception messages. The
+            event database can still contain command arguments; treat it as
+            private.
+          </p>
+        </section>
+        <section>
+          <h2>Project settings</h2>
+          <p>
+            Only explicit <code>scrip setup --apply</code> writes the project
+            hook configuration. It preserves unrelated hooks and backs up
+            existing contents. Start and stop change private authorization state
+            rather than application binaries or global IDE settings.
+          </p>
+        </section>
+        <section>
+          <h2>This website</h2>
+          <p>
+            The site provides product pages and downloads. The home, setup, and
+            privacy pages use visit and download statistics from
+            anwarhussen.tech. Random browser identifiers measure visits. The
+            analytics integration respects Do Not Track and Global Privacy
+            Control. Local agent events, project files, approval rules, and
+            credentials are excluded from website analytics. Copy buttons use
+            the clipboard when clicked.
+          </p>
+          <p>
+            Hosting infrastructure processes connection information such as IP
+            addresses and request metadata to serve the website and downloads.
+            Your agent and third-party services have their own data practices.
+          </p>
+          <p>
+            <button
+              type="button"
+              class="preference-button"
+              data-analytics-optout
+            >
+              Turn off visit statistics
+            </button>
+          </p>
+          <p class="fine-print">
+            This preference is saved in this browser’s local storage.
+          </p>
+        </section>
+        <section>
+          <h2>Stopping and removing data</h2>
+          <p>
+            Use <code>scrip stop</code> to revoke future Scrip approvals in a
+            configured project. Remove the Scrip project hook before
+            uninstalling. Private state remains after uninstall to preserve
+            history; back it up before deleting it manually.
+          </p>
+          <p>
+            Do not publish local databases, setup records, tokens, or unredacted
+            agent transcripts.
+          </p>
+        </section>
+        <p class="fine-print">
+          Updated for Scrip Terminal __SCRIP_VERSION__ · November 2026
         </p>
-        <h2>Workspace settings</h2>
-        <p>
-          A connection changes only the selected project's documented Claude
-          Code settings after you review and confirm it. Existing settings are
-          backed up. Disconnect removes owned hook entries. Uninstall does not
-          erase private history or change host settings silently.
-        </p>
-        <h2>The website</h2>
-        <p>
-          This public website uses anonymous visit and download statistics from anwarhussen.tech. Random browser identifiers measure visits; Do Not Track and Global Privacy Control are respected. No local agent events, files, approval rules or credentials are sent to analytics. Hosting infrastructure also handles network information to serve downloads and maintain security.
-        </p>
-        <h2>Your choices</h2>
-        <p>
-          Disconnect projects and quit Scrip to stop collecting new activity.
-          Private state is retained on uninstall so upgrades do not erase it.
-          Keep a backup before manually removing local state. Never publish your
-          local database, token, or unredacted agent requests.
-        </p>
-      <p><button type="button" data-analytics-optout>Turn off visit statistics</button></p>
-      </section>
+      </div>
     </main>
     <footer class="footer wrap">
-      <span>&copy; 2026 Scrip</span>
       <div>
-        <a href="quickstart.html">Getting started</a
-        ><a href="privacy.html">Privacy</a
-        ><a href="downloads/SHA256SUMS">Checksums</a
-        ><a href="release.json">Release details</a>
+        <a href="./" class="footer-name">Scrip</a>
+        <p>A little room to keep moving.</p>
+        <small>© 2026 Anwar Dev</small>
       </div>
+      <nav aria-label="Footer navigation">
+        <a href="quickstart.html">Get started</a
+        ><a href="support.html">Support & compatibility</a
+        ><a href="releases.html">Releases</a><a href="privacy.html">Privacy</a
+        ><a href="security.html">Security</a
+        ><a href="downloads/SHA256SUMS">Checksums</a>
+      </nav>
     </footer>
-  <script defer src="analytics-preferences.js"></script>
+    <div class="copy-status" role="status" aria-live="polite"></div>
+    <script src="site.js" defer></script>
+    <script defer src="analytics-preferences.js"></script>
   </body>
 </html>

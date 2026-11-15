@@ -3,13 +3,14 @@
 from collections.abc import Mapping
 from types import MappingProxyType
 
-from . import antigravity, claude_code
+from . import antigravity, claude_code, cursor
 from .common import HookAdapter
 
 _ADAPTERS: Mapping[str, HookAdapter] = MappingProxyType(
     {
         "antigravity": antigravity,
         "claude-code": claude_code,
+        "cursor": cursor,
     }
 )
 

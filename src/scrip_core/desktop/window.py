@@ -24,8 +24,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ..records import RequestDetails, RequestRecord
-from .presentation import DesktopSnapshot, request_text
+from ..records import CoreSnapshot, RequestDetails, RequestRecord
+from .presentation import request_text
 
 STYLE = """
 QMainWindow, QWidget { background: #101619; color: #e7eeee; font-size: 13px; }
@@ -213,7 +213,7 @@ class InboxWindow(QMainWindow):
         self.setCentralWidget(root)
 
     @Slot(object)
-    def apply_snapshot(self, snapshot: DesktopSnapshot) -> None:
+    def apply_snapshot(self, snapshot: CoreSnapshot) -> None:
         self.alerts_panel.show_snapshot(snapshot)
         if self.problem_active:
             self.footer.setText("Local state refreshed. Connection recovered.")

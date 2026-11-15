@@ -11,8 +11,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ..records import NotificationRecord
-from .presentation import DesktopSnapshot
+from ..records import CoreSnapshot, NotificationRecord
 from .window import plain_label
 
 STATES = {
@@ -76,7 +75,7 @@ class AlertsPanel(QWidget):
             else "Desktop notification delivery is unavailable in this session. Use Inbox."
         )
 
-    def show_snapshot(self, snapshot: DesktopSnapshot) -> None:
+    def show_snapshot(self, snapshot: CoreSnapshot) -> None:
         pending = {request.event_id for request in snapshot.requests}
         self.retryable = {
             item.id

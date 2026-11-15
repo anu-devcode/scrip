@@ -1,17 +1,32 @@
 # Security
 
-Scrip distributes an early Windows desktop release at https://scrip.anwardev.me. Installers
+Scrip distributes an early Windows terminal release at https://scrip.anwardev.me. Installers
 are currently unsigned. The download site is public; the companion service and private
 agent activity run locally. A monitored public security response service has not been
 established, and live host-version certification remains outstanding.
 
 ## Reporting
 
-Before public release, maintainers must activate a monitored private disclosure channel and
-replace this paragraph with its verified contact details. Until then, report potential issues
-privately to the maintainer through the existing project communication channel. Do not post
-API tokens, private tool arguments, database contents, or exploitable permission details in
-public issues. No response-time commitment is currently offered.
+A dedicated monitored private disclosure inbox is still outstanding. Existing project
+collaborators can contact the maintainer through their established private channel. Keep
+API tokens, command arguments, database contents, and exploitable permission details private.
+No response-time commitment is currently offered.
+
+## Terminal authorization
+
+The 0.4.0 terminal workflow uses local SQLite state directly. `scrip start` authorizes every
+shell command in the first valid conversation to bind, within the configured project, for
+up to 24 hours. This includes deletion, writes, network access, and publishing. The working
+directory is not an OS sandbox. Native Ask/Deny rules and explicit Scrip deny rules apply.
+Other conversations do not inherit the grant. `scrip stop` revokes future Scrip approvals.
+Questions and other tool types remain outside command authorization. Exact-command mode
+is available with `scrip start --exact`. Invalid callbacks request native review.
+
+Only `scrip setup --apply` installs the named documented project hook after review. Start
+and stop modify private authorization state. Local state can contain commands and workspace
+paths and is accessible to the same OS user. Uninstall preserves that state and project hooks.
+Remove the Scrip hook before uninstalling. The public website's security page describes the
+shipped terminal scope. The following boundaries also cover optional source components.
 
 ## Current boundaries
 

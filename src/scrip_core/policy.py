@@ -2,6 +2,7 @@
 
 from datetime import datetime
 
+from .authorization import ProjectAuthorization
 from .models import QUESTION_TOOLS, Decision, Rule, ToolRequested, canonical_json, utc_now
 
 
@@ -11,6 +12,7 @@ def decide(
     *,
     paused: bool = False,
     now: datetime | None = None,
+    authorization: ProjectAuthorization | None = None,
 ) -> Decision:
     if event.payload.name in QUESTION_TOOLS:
         return Decision(action="ask", reason="A question needs a human answer")
@@ -32,6 +34,13 @@ def decide(
         return Decision(action="deny", reason=f"Denied by rule {denied.id}", rule_id=denied.id)
     if paused:
         return Decision(action="ask", reason="Scrip automatic decisions are paused")
+    if (
+        authorization is not None
+        and authorization.expires_at > now
+        and authorization.session is not None
+        and authorization.session.matches(event)
+    ):
+        return Decision(action="allow", reason="Authorized for this conversation by scrip start")
     allowed = next((rule for rule in matches if rule.action == "allow"), None)
     if allowed:
         return Decision(

@@ -96,6 +96,9 @@ The CLI imports Qt only for `scrip desktop`; the headless core has no Qt depende
 worker thread performs database reads, acknowledgement, and pause changes. The GUI renders
 typed snapshots and plain text request details. Full pending-request lookup is independent
 of the bounded history view. Stale detail results cannot replace a newer selected request.
+Each desktop refresh expires requests and reads status, inbox, sessions, rules, and alerts
+in one application-service transaction. This replaces five separate transactions and gives
+the view one consistent database snapshot. It does not change the two-second polling interval.
 
 The tray sink hands a notification to the GUI thread and waits for bounded acceptance before
 the outbox is marked delivered. Cancellation, a missing tray, or a timed-out handoff defers
@@ -125,8 +128,9 @@ processes running as the same OS user. Local management commands can change rule
 Hook adapters default to observation. Enforcing mode translates decisions through each host's
 native protocol and returns to native review if the core is unavailable. Question tools use
 the native question flow. Antigravity routing currently requires one workspace root; Claude
-Code assumes a fixed working directory per session. Tool IDs are stable; lifecycle callbacks
-without source event IDs are not guaranteed to deduplicate.
+Code assumes a fixed working directory per session. Cursor requires one local workspace root
+and uses conservative generation-scoped shell/MCP identities as described below. Lifecycle
+callbacks without source event IDs are not guaranteed to deduplicate.
 
 Tests exercise fixtures and real Scrip subprocesses over loopback, not installed host apps.
 A live adapter release needs a documented host version/platform matrix and isolated
@@ -136,14 +140,26 @@ part of this architecture.
 
 ## Explicit workspace connections
 
-The desktop worker prepares a Claude Code settings plan without writes. The GUI displays
+The desktop worker prepares a Claude Code or Cursor settings plan without writes. The GUI displays
 that plan as plain text and sends a save intent only after the user confirms. The worker
 rechecks the original bytes, backs up existing settings, preserves unrelated hooks, and
 atomically writes the result. A separate local receipt records owned entries and enables
 selective disconnection without restoring an outdated full-file backup over later edits.
 Configuration status is distinct from a session receiving events.
+Receipts are scoped by host and workspace. Only entries added by Scrip are owned; identical
+entries already present before connection remain after disconnect. Historical Claude receipts
+keep their original location and remain readable. Disconnect does not recreate a deleted file.
 
 Claude Code uses its documented executable/args hook form, avoiding shell parsing of paths.
 Frozen builds use a console hook executable next to the GUI executable. Native enforcement
 semantics remain in each adapter. The window can propose a scoped exact rule from an actual
 pending tool request; a second review precedes saving. GUI-created rules expire in 24 hours.
+
+Cursor's documented Windows transport runs PowerShell: executable and arguments use literal
+single-quoted strings, with doubled apostrophes. POSIX uses shell quoting. Its generic
+`preToolUse` interface cannot enforce `ask`, so Scrip installs only shell/MCP permission hooks
+in rules mode, with `failClosed`. Visibility mode installs no permission hooks. Shell/MCP
+hooks lack unique call IDs; identical calls in one generation share an approval scope and
+repeated automatic approvals fall back to native review. Server identity, endpoint or launch
+command, full MCP input, and shell cwd/sandbox remain explicit rule arguments. Cursor outputs,
+transcripts, reasoning, and email are not stored. See [Cursor integration](integrations/cursor.md).

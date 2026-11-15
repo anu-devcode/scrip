@@ -1,19 +1,9 @@
 """Plain text presentation shared by the desktop window and its tests."""
 
 import json
-from dataclasses import dataclass
 
-from ..models import InputRequested, Rule
-from ..records import CoreStatus, NotificationRecord, RequestDetails, RequestRecord, SessionRecord
-
-
-@dataclass(frozen=True)
-class DesktopSnapshot:
-    status: CoreStatus
-    requests: tuple[RequestRecord, ...]
-    sessions: tuple[SessionRecord, ...]
-    rules: tuple[Rule, ...] = ()
-    notifications: tuple[NotificationRecord, ...] = ()
+from ..models import InputRequested
+from ..records import RequestDetails
 
 
 def request_text(details: RequestDetails) -> str:

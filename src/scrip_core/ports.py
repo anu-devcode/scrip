@@ -5,6 +5,7 @@ from contextlib import AbstractContextManager
 from datetime import datetime, timedelta
 from typing import Protocol
 
+from .authorization import ProjectAuthorization
 from .models import Event, IngestResult, InputRequested, Rule, ToolRequested
 from .records import (
     CoreStatus,
@@ -20,6 +21,8 @@ SessionKey = tuple[str, str]
 
 
 class Repository(Protocol):
+    def project_authorization(self) -> ProjectAuthorization | None: ...
+    def set_project_authorization(self, authorization: ProjectAuthorization | None) -> None: ...
     def expire(self, now: datetime) -> None: ...
     def event(self, event_id: str, fingerprint: str) -> IngestResult | None: ...
     def record_event(self, event: Event, result: IngestResult, now: datetime) -> None: ...
