@@ -151,6 +151,13 @@ Set these GitHub values after the hostname and restricted key are ready:
 | `azure-production` secret | `SCRIP_DEPLOY_KEY` | New restricted private key |
 | `azure-production` secret | `SCRIP_KNOWN_HOSTS` | Verified host-key records |
 
+Run the workflow from the `main` branch with an existing release tag. The
+`azure-production` environment allows only `main`, and the workflow verifies that the
+bundle's source commit matches its tag and belongs to `origin/main`. The release workflow
+also rejects source commits outside `main`. The public health check verifies the source
+commit alongside the tool version. Repository administrators follow the protected branch
+requirements as well.
+
 Run the workflow with an existing release tag. It downloads the published bundle, checks
 its checksum, streams it over pinned SSH to the restricted publisher, and verifies the
 public version afterward. It cannot bootstrap the server or change other services.

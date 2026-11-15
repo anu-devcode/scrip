@@ -1,6 +1,6 @@
 # Contributing to Scrip
 
-Scrip is a development alpha being prepared for a public repository. Read [AGENTS.md](AGENTS.md),
+Scrip is an open-source development alpha. Read [AGENTS.md](AGENTS.md),
 [architecture](docs/architecture.md), and [development](docs/development.md) before changing
 permission, adapter, or persistence behavior.
 
@@ -15,6 +15,16 @@ uv run mypy src
 uv run python -m devtools.demo
 uv build
 ```
+
+## Branches and merging
+
+Use `feat/`, `fix/`, `chore/`, `docs/`, or another conventional purpose prefix, followed by
+a descriptive name. Open a pull request into `main` and pass the required CI checks.
+`main` is protected from direct pushes, force pushes, and deletion. Resolve open review
+conversations before merging. Administrators follow the same branch rules.
+
+Azure publication runs from `main`. Release tags must identify commits already merged into
+`main`. The production environment accepts the `main` branch only.
 
 ## Change guidelines
 

@@ -24,3 +24,8 @@ Do not claim unlimited scale, universal host compatibility, or launch readiness 
 Desktop code uses the optional PySide6 Essentials dependency. Keep database operations off
 the GUI thread, render host text as plain text, and submit tray alerts only on the GUI thread.
 Offscreen widget tests must never display native alerts or alter a host's settings.
+
+Create branches using conventional purpose prefixes such as `feat/`, `fix/`, `chore/`,
+`docs/`, or `refactor/`. Choose a concise descriptive suffix. All changes enter `main`
+through a pull request with passing required CI checks. Production deployments run from
+`main` and use release commits already merged into `main`.
