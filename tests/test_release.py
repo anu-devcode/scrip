@@ -137,3 +137,11 @@ def test_real_site_has_working_local_links_and_no_inline_scripts(tmp_path, relea
     assert "assets/inbox.png" not in manifest["files"]
     assert all(name in manifest["files"] for name in WEB_FILES)
     assert "Scrip-Terminal-" in (public / "index.html").read_text(encoding="utf-8")
+
+    logo = (public / "assets/wordmark.svg").read_text(encoding="utf-8")
+    assert 'id="word-letter-s"' not in logo
+    assert all(f'id="word-letter-{letter}"' in logo for letter in "crip")
+    privacy = (public / "privacy.html").read_text(encoding="utf-8")
+    assert "data-analytics-optout" in privacy
+    assert "analytics-preferences.js" in privacy
+    assert (public / "analytics-preferences.js").is_file()
