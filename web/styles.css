@@ -222,16 +222,7 @@ a:hover {
   justify-content: center;
   align-items: center;
 }
-.hero-art:before {
-  content: "";
-  position: absolute;
-  inset: 16% 9%;
-  background: #244c3c;
-  filter: blur(75px);
-  opacity: 0.5;
-  z-index: -1;
-  border-radius: 50%;
-}
+
 .hero-art > picture,
 .hero-art > .companion-still {
   width: 100%;

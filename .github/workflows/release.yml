@@ -62,7 +62,7 @@ jobs:
           $installPath = Join-Path $env:RUNNER_TEMP 'scrip-installer-check'
           $registration = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{09C01260-7E81-4BC2-BB3C-F215D4405581}_is1'
           if ((Test-Path -LiteralPath $registration) -or (Test-Path -LiteralPath $installPath)) { throw 'Installer check requires an unused runner and isolated paths' }
-          $originalUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+          $originalUserPath = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -ne '' }) -join ';'
           $uninstaller = Join-Path $installPath 'unins000.exe'
           try {
             1..2 | ForEach-Object {
@@ -82,7 +82,7 @@ jobs:
           }
           if (Test-Path -LiteralPath $registration) { throw 'Uninstall left an installer registration' }
           if (Test-Path -LiteralPath (Join-Path $installPath 'scrip.exe')) { throw 'Uninstall left the application executable' }
-          $restoredUserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+          $restoredUserPath = @([Environment]::GetEnvironmentVariable('Path', 'User') -split ';' | Where-Object { $_ -ne '' }) -join ';'
           if ($restoredUserPath -ne $originalUserPath) { throw 'Uninstall did not restore the user PATH' }
       - name: Build package and verified public distribution
         run: |
