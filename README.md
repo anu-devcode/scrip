@@ -1,40 +1,65 @@
 # Scrip
 
-Scrip Terminal provides project-terminal start/stop controls for shell-command approval
-in one Antigravity conversation. The public Windows x64 installer is available at
-[ scrip.anwardev.me ](https://scrip.anwardev.me).
+Start and stop shell-command approval for one Antigravity conversation from your project
+terminal. The current installer supports **Windows 10/11 x64**.
 
-## Install and connect
+## Install
 
-Download **Scrip Terminal 0.4.0** and run the per-user installer. Keep the user-PATH option
-selected, then restart your editor so terminals and agent hooks inherit it. The installer
-bundles its Python runtime and is currently unsigned.
+[Download Scrip Terminal 0.4.0](https://scrip.anwardev.me/downloads/Scrip-Terminal-0.4.0-windows-x64-setup.exe)
 
-From your project root, review and explicitly apply the documented hook configuration once.
-Existing unrelated hooks are preserved and backed up.
+1. Run the installer and keep **Add Scrip to your user PATH** selected.
+2. Restart your editor so its terminal and agent hooks receive the new PATH.
+3. Open a terminal in your project folder and review the proposed hook setup.
 
 ```powershell
 scrip setup
 scrip setup --apply
 ```
 
-## Daily use
+Setup is needed once per project. It installs the named hook in `.agents/hooks.json`,
+preserves unrelated hooks, and backs up existing settings. Begin a new agent turn after
+setup. An already-open approval prompt still needs a response in Antigravity.
+
+The installer bundles its runtime and is unsigned. Download checksums are available at
+[SHA256SUMS](https://scrip.anwardev.me/downloads/SHA256SUMS).
+
+## Use
 
 ```powershell
 scrip start
+```
+
+Continue your intended Antigravity conversation. The first valid shell-command callback
+binds Scrip to that conversation. Subsequent commands in the same conversation receive
+Scrip approval until you stop it or 24 hours pass.
+
+```powershell
 scrip status --project
 scrip stop
 ```
 
-Start authorizes all shell commands in one conversation, bound to the first valid command
-callback after start. This includes writes, deletion, publishing, and network access. The
-grant expires after 24 hours. Stop revokes future Scrip approvals. Native Ask/Deny rules
-still apply, and questions require your answer. A working directory provides no OS isolation.
-Exact saved-command mode is also available through `scrip start --exact`.
+Start authorizes every shell command in the bound conversation, including writes, deletion,
+publishing, and network access. Native Ask/Deny rules still apply. Questions require your
+answer. Other conversations and projects do not inherit the grant. Stop revokes future
+Scrip approvals. Running commands continue.
 
-See the [setup guide](https://scrip.anwardev.me/quickstart.html) and
-[compatibility notes](https://scrip.anwardev.me/support.html). The terminal installer targets
-Windows x64 and Antigravity command hooks. Live host-version validation remains in progress.
+To switch conversations, stop and start again. Repeating start while active preserves the
+existing binding. Active status alone does not establish that the host delivered a callback.
+
+## Compatibility and troubleshooting
+
+This release integrates with Antigravity's documented command hooks. You can run the Scrip
+command in your usual editor terminal. Approval support depends on the agent's hook interface.
+Live Antigravity-version validation is still in progress.
+
+- If `scrip` is unrecognized, restart the terminal's parent application and check the PATH
+  installer option. The executable is `%LOCALAPPDATA%\Programs\ScripTerminal\scrip.exe`.
+- If approvals still prompt, check `scrip status --project` and Antigravity's native rules.
+  Invalid callbacks require native review.
+- For exact saved-command mode, updates, and removal, see the
+  [project integration guide](docs/integrations/antigravity-project.md).
+- Report reproducible bugs through [GitHub Issues](https://github.com/anu-devcode/scrip/issues).
+  Keep local databases, tokens, private paths, and raw agent transcripts out of reports.
 
 ## Other components
 
@@ -65,7 +90,7 @@ contracts/       synchronized event contract
 tests/           isolated regression and protocol cases
 devtools/        build, release, process-test, and screenshot tooling
 deploy/          Windows installer and Azure static publishing
-web/             public website and getting-started guide
+web/             minimal download page and preserved expanded website
 assets/brand/    brand source and exports
 ```
 

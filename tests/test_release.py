@@ -141,7 +141,20 @@ def test_real_site_has_working_local_links_and_no_inline_scripts(tmp_path, relea
     logo = (public / "assets/wordmark.svg").read_text(encoding="utf-8")
     assert 'id="word-letter-s"' not in logo
     assert all(f'id="word-letter-{letter}"' in logo for letter in "crip")
-    privacy = (public / "privacy.html").read_text(encoding="utf-8")
-    assert "data-analytics-optout" in privacy
-    assert "analytics-preferences.js" in privacy
-    assert (public / "analytics-preferences.js").is_file()
+    index = (public / "index.html").read_text(encoding="utf-8")
+    assert "https://github.com/anu-devcode/scrip#readme" in index
+    assert "scrip setup --apply" in index
+    assert "scrip start" in index and "scrip stop" in index
+    assert "<nav" not in index and "<script" not in index
+    assert ".gif" not in index and "mascot" not in index
+    for name in (
+        "quickstart.html",
+        "support.html",
+        "privacy.html",
+        "security.html",
+        "releases.html",
+    ):
+        assert not (public / name).exists()
+        assert (Path(__file__).resolve().parents[1] / "web/expanded" / name).is_file()
+    assert not (public / "expanded").exists()
+    assert "analytics-preferences.js" not in manifest["files"]

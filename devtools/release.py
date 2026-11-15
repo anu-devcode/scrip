@@ -16,25 +16,11 @@ from packaging.version import Version
 from scrip_core import __version__
 
 ROOT = Path(__file__).resolve().parents[1]
-WEB_FILES = (
-    "index.html",
-    "quickstart.html",
-    "privacy.html",
-    "support.html",
-    "security.html",
-    "releases.html",
-    "site.js",
-    "sitemap.xml",
-    "404.html",
-    "styles.css",
-    "robots.txt",
-    "analytics-preferences.js",
-)
+# The expanded website is retained under web/expanded and deliberately excluded.
+WEB_FILES = ("index.html", "404.html", "styles.css", "robots.txt", "sitemap.xml")
 ASSETS = {
-    "wordmark.svg": "v2/scrip-logo-dark-v2.svg",
-    "mascot.png": "scrip-mascot-reference-v1.png",
-    "mascot.gif": "motion/scrip-mascot-idle.gif",
-    "icon.png": "icons/scrip-icon-128.png",
+    "wordmark.svg": "v2/scrip-logo-v2.svg",
+    "icon.png": "v2/icons/scrip-icon-128.png",
 }
 
 
