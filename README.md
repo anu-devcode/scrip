@@ -5,7 +5,7 @@ terminal. The current installer supports **Windows 10/11 x64**.
 
 ## Install
 
-[Download Scrip Terminal 0.4.0](https://scrip.anwardev.me/downloads/Scrip-Terminal-0.4.0-windows-x64-setup.exe)
+[Download Scrip Terminal 0.4.1](https://scrip.anwardev.me/downloads/Scrip-Terminal-0.4.1-windows-x64-setup.exe)
 
 1. Run the installer and keep **Add Scrip to your user PATH** selected.
 2. Restart your editor so its terminal and agent hooks receive the new PATH.
@@ -45,6 +45,9 @@ Scrip approvals. Running commands continue.
 
 To switch conversations, stop and start again. Repeating start while active preserves the
 existing binding. Active status alone does not establish that the host delivered a callback.
+
+Setup, start, and stop each print a short confirmation. Use `scrip setup` to inspect the
+hook configuration and `scrip status --project` for scope, binding, and expiry details.
 
 ## Compatibility and troubleshooting
 

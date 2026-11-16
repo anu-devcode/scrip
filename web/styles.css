@@ -66,14 +66,49 @@ li {
   padding-left: 4px;
   margin-bottom: 20px;
 }
-pre {
-  margin: 12px 0 0;
-  padding: 12px 16px;
+.command {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 8px 10px 8px 16px;
   border: 1px solid #d1d9e0;
   border-radius: 5px;
+}
+pre {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
   overflow-x: auto;
   font-size: 14px;
   line-height: 1.7;
+}
+.copy {
+  flex-shrink: 0;
+  min-width: 58px;
+  min-height: 36px;
+  padding: 5px 9px;
+  border: 1px solid #d1d9e0;
+  border-radius: 4px;
+  background: #fff;
+  color: #0969da;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.copy:hover {
+  background: #f6f8fa;
+}
+.copy:focus-visible {
+  outline: 2px solid #0969da;
+  outline-offset: 3px;
+}
+.copy-status {
+  color: #59636e;
+  font-size: 14px;
+}
+.copy-status:empty {
+  display: none;
 }
 code {
   font-family: ui-monospace, "Cascadia Code", Consolas, monospace;

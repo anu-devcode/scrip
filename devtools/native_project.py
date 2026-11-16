@@ -32,7 +32,7 @@ def check(executable: Path) -> None:
 
         cli("setup", "--allow-command", proposed)
         assert not state.exists() and not (workspace / ".agents").exists()
-        cli("setup", "--allow-command", proposed, "--apply")
+        assert cli("setup", "--allow-command", proposed, "--apply") == "Scrip setup complete.\n"
         target = workspace / ".agents/hooks.json"
         before = target.read_bytes()
         entry = json.loads(before)["scrip-project-commands"]["PreToolUse"][0]["hooks"][0]
@@ -88,17 +88,17 @@ def check(executable: Path) -> None:
         assert hook(2, proposed) == "allow"
         assert hook(3, proposed + "; git push") == "allow"
         assert hook(4, proposed, "powershell") == "auto_approve"
-        cli("stop")
+        assert cli("stop") == "Scrip stopped.\n"
         assert hook(5, proposed) == "allow"
         assert not json.loads(cli("status", "--project"))["active"]
-        cli("start")
+        assert cli("start") == "Scrip started.\n"
         assert json.loads(cli("status", "--project"))["scope"] == "conversation"
         assert hook(6, "NEVER_EXECUTE_FIRST_SESSION_COMMAND") == "auto_approve"
         assert hook(7, "NEVER_EXECUTE_DIFFERENT_SESSION_COMMAND", live_shape=True) == "auto_approve"
         assert hook(8, "NEVER_EXECUTE_OTHER_CONVERSATION", conversation="other") == "allow"
         cli("start")  # Starting again must not silently unbind a conversation.
         assert json.loads(cli("status", "--project"))["bound_session"] == "native-project-check"
-        cli("stop")
+        assert cli("stop") == "Scrip stopped.\n"
         assert hook(9, "NEVER_EXECUTE_AFTER_STOP") == "allow"
         assert target.read_bytes() == before
     print(

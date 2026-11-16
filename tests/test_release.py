@@ -146,7 +146,11 @@ def test_real_site_has_working_local_links_and_no_inline_scripts(tmp_path, relea
     assert "Start and stop Antigravity command approvals from your terminal." in index
     assert "scrip setup --apply" in index
     assert "scrip start" in index and "scrip stop" in index
-    assert "<nav" not in index and "<script" not in index
+    assert "<nav" not in index
+    assert index.count('<script src="/commands.js" defer></script>') == 1
+    assert index.count('class="copy"') == 3
+    for command in ("scrip setup --apply", "scrip start", "scrip stop"):
+        assert f'data-copy="{command}"' in index
     assert ".gif" not in index and "mascot" not in index
     for name in (
         "quickstart.html",
