@@ -1,12 +1,14 @@
 # Antigravity project commands
 
-The v0.4.2 Scrip Terminal Windows build includes a bundled `scrip.exe` console command
+The v0.4.3 Scrip Terminal Windows build includes a bundled `scrip.exe` console command
 and its Python runtime. It does not require Qt, system Python, or the Scrip desktop app.
 It installs separately under `%LOCALAPPDATA%/Programs/ScripTerminal`. Use the Scrip Terminal installer from https://scrip.anwardev.me for these commands.
 Older desktop installers do not include this workflow.
 The installer offers adding Scrip to the current user's PATH for terminal commands. The
 project hook resolves Scrip's runtime directly during setup, so it can start even when the
-agent host inherited an older PATH. After updating from 0.4.1 or earlier, run
+agent host inherited an older PATH. On Windows, built-in Windows PowerShell forwards the
+hook input using UTF-8. Its encoded script avoids executable-path quote corruption at the
+host's CMD argument boundary. After updating from 0.4.2 or earlier, run
 `scrip setup --apply` again, then `scrip start` to replace the earlier PATH-dependent hook.
 Begin a new agent turn to load the updated hook.
 

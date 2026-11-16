@@ -17,7 +17,7 @@ def check(executable: Path) -> None:
     )
     with tempfile.TemporaryDirectory(prefix="scrip-project-package-") as directory:
         root = Path(directory).resolve()
-        workspace, state = root / "O'Brien & project", root / "state"
+        workspace, state = root / "O'Brien & café project", root / "state"
         workspace.mkdir()
         proposed = 'git grep -n "staffPortalRoutes"'
 
@@ -67,11 +67,11 @@ def check(executable: Path) -> None:
                 del raw["toolCall"]["args"]["Cwd"]
                 raw["toolCall"]["args"]["toolSummary"] = "Display-only test description"
             result = subprocess.run(
-                f'cmd.exe /D /S /C "{generated}"',
-                input=json.dumps(raw),
+                ["cmd.exe", "/D", "/S", "/C", generated],
+                input=json.dumps(raw, ensure_ascii=False),
                 cwd=workspace,
                 env=environment,
-                text=True,
+                encoding="utf-8",
                 capture_output=True,
                 check=True,
                 timeout=15,
