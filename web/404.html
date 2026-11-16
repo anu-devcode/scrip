@@ -32,14 +32,45 @@
         </li>
         <li>
           Open a terminal in your project folder. Set up the project once.
-          <pre><code>scrip setup --apply</code></pre>
+          <div class="command">
+            <pre><code>scrip setup --apply</code></pre>
+            <button
+              type="button"
+              class="copy"
+              data-copy="scrip setup --apply"
+              aria-label="Copy setup command"
+            >
+              Copy
+            </button>
+          </div>
         </li>
         <li>
           Start approvals when you need them. Stop when finished.
-          <pre><code>scrip start
-scrip stop</code></pre>
+          <div class="command">
+            <pre><code>scrip start</code></pre>
+            <button
+              type="button"
+              class="copy"
+              data-copy="scrip start"
+              aria-label="Copy start command"
+            >
+              Copy
+            </button>
+          </div>
+          <div class="command">
+            <pre><code>scrip stop</code></pre>
+            <button
+              type="button"
+              class="copy"
+              data-copy="scrip stop"
+              aria-label="Copy stop command"
+            >
+              Copy
+            </button>
+          </div>
         </li>
       </ol>
+      <p class="copy-status" role="status" aria-live="polite"></p>
       <p class="details">
         For Antigravity shell commands in one conversation, for up to 24 hours.
         Questions and native permission rules still apply.
@@ -50,5 +81,6 @@ scrip stop</code></pre>
         >
       </p>
     </main>
+    <script src="/commands.js" defer></script>
   </body>
 </html>

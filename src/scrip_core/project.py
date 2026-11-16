@@ -362,35 +362,19 @@ def command(args: argparse.Namespace) -> None:
     workspace, base = Path.cwd().resolve(), Path(args.data_dir).resolve()
     if args.command == "setup":
         plan = plan_setup(workspace, base, args.allow_command)
-        print(f"Review Antigravity project hooks: {plan.target}\n{plan.content}")
-        print("Exact commands:")
-        for item in plan.record.commands:
-            print(f"  {item}")
         if args.apply:
             apply_setup(plan, base, confirmed=True)
-            print("Setup saved. No approvals are active. Run scrip start when ready.")
+            print("Scrip setup complete.")
         else:
+            print(f"Review Antigravity project hooks: {plan.target}\n{plan.content}")
+            if plan.record.commands:
+                print("Exact commands:")
+                for item in plan.record.commands:
+                    print(f"  {item}")
             print("Preview only. To approve this setup, repeat the command with --apply.")
     elif args.command == "start":
-        authorization = start(workspace, base, session_mode=not args.exact)
-        print(f"Scrip active for {workspace}. Expires: {authorization.expires_at.isoformat()}")
-        if authorization.session is not None:
-            print(
-                "All shell commands in ONE conversation are authorized, including writes, "
-                "deletions, publishing, and network commands. This is not a sandbox."
-            )
-            bound = authorization.session.session_id or "waiting for first valid command"
-            print(f"Bound conversation: {bound}")
-            print("Other conversations do not inherit approval. Questions still need your answer.")
-        else:
-            for rule in authorization.rules:
-                print(f"  Allowed exactly: {rule.arguments['CommandLine']}")
-        print(
-            "Stop with scrip stop. Host Ask/Deny rules still apply; "
-            "existing prompts need a response."
-        )
+        start(workspace, base, session_mode=not args.exact)
+        print("Scrip started.")
     else:
         stop(workspace, base)
-        print(
-            f"Scrip stopped for {workspace}. Already-issued approvals and running commands remain."
-        )
+        print("Scrip stopped.")

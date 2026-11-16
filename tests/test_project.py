@@ -9,7 +9,7 @@ import sys
 
 import pytest
 
-from scrip_core import project
+from scrip_core import cli, project
 from scrip_core.bootstrap import create_service
 
 COMMAND = 'git grep -n "staffPortalRoutes"'
@@ -289,3 +289,48 @@ def test_redirected_settings_are_not_followed(tmp_path):
     with pytest.raises(ValueError, match="redirected"):
         project.plan_setup(workspace, tmp_path / "state", [COMMAND])
     assert list(outside.iterdir()) == []
+
+
+def test_applied_project_commands_print_one_short_confirmation(tmp_path, monkeypatch, capsys):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    base = tmp_path / "state"
+    monkeypatch.chdir(workspace)
+
+    def run(*arguments):
+        monkeypatch.setattr(sys, "argv", ["scrip", "--data-dir", str(base), *arguments])
+        assert cli.main() == 0
+        result = capsys.readouterr()
+        assert result.err == ""
+        return result.out
+
+    assert run("setup", "--allow-command", COMMAND, "--apply") == "Scrip setup complete.\n"
+    assert project.status(workspace, base)["configured"]
+    assert not project.status(workspace, base)["active"]
+    assert run("start") == "Scrip started.\n"
+    assert project.status(workspace, base)["scope"] == "conversation"
+    assert run("stop") == "Scrip stopped.\n"
+    assert not project.status(workspace, base)["active"]
+    assert run("start", "--exact") == "Scrip started.\n"
+    assert project.status(workspace, base)["scope"] == "exact"
+    assert run("stop") == "Scrip stopped.\n"
+    preview = run("setup")
+    assert "Review Antigravity project hooks" in preview
+    assert "Preview only" in preview
+    status = json.loads(run("status", "--project"))
+    assert not status["active"]
+
+
+@pytest.mark.parametrize("arguments", [("start",), ("setup", "--apply")])
+def test_failed_commands_do_not_print_success(tmp_path, monkeypatch, capsys, arguments):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    hooks = workspace / ".agents"
+    hooks.mkdir()
+    (hooks / "hooks.json").write_text("invalid JSON")
+    monkeypatch.chdir(workspace)
+    monkeypatch.setattr(sys, "argv", ["scrip", "--data-dir", str(tmp_path / "state"), *arguments])
+    assert cli.main() == 1
+    result = capsys.readouterr()
+    assert result.out == ""
+    assert result.err.startswith("Scrip: ")

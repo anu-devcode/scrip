@@ -17,7 +17,7 @@ from scrip_core import __version__
 
 ROOT = Path(__file__).resolve().parents[1]
 # The expanded website is retained under web/expanded and deliberately excluded.
-WEB_FILES = ("index.html", "404.html", "styles.css", "robots.txt", "sitemap.xml")
+WEB_FILES = ("index.html", "404.html", "styles.css", "commands.js", "robots.txt", "sitemap.xml")
 ASSETS = {
     "wordmark.svg": "v2/scrip-logo-v2.svg",
     "icon.png": "v2/icons/scrip-icon-128.png",
