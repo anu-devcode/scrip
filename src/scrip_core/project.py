@@ -8,7 +8,6 @@ import hashlib
 import json
 import os
 import shlex
-import subprocess
 import sys
 from contextlib import suppress
 from dataclasses import dataclass
@@ -112,11 +111,22 @@ def plan_setup(workspace: Path, base: Path, commands: list[str]) -> SetupPlan:
         "--installation-id",
         installation,
     ]
-    command_line = (
-        f'"{arguments[0]}" {subprocess.list2cmdline(arguments[1:])}'
-        if os.name == "nt"
-        else shlex.join(arguments)
-    )
+    command_line = shlex.join(arguments)
+    if os.name == "nt":
+        # A host may pass the whole command through Windows argv quoting before
+        # CMD parses it. EncodedCommand keeps executable-path quotes out of that
+        # boundary while forwarding the original JSON on stdin to the runtime.
+        invocation = " ".join("'" + argument.replace("'", "''") + "'" for argument in arguments)
+        script = (
+            "$ProgressPreference = 'SilentlyContinue'; "
+            "$encoding = [System.Text.UTF8Encoding]::new($false); "
+            "[Console]::InputEncoding = $encoding; [Console]::OutputEncoding = $encoding; "
+            "$OutputEncoding = $encoding; [Console]::In.ReadToEnd() | & "
+            + invocation
+            + "; exit $LASTEXITCODE"
+        )
+        encoded = base64.b64encode(script.encode("utf-16le")).decode("ascii")
+        command_line = "powershell.exe -NoProfile -NonInteractive -EncodedCommand " + encoded
     entry = {
         "enabled": True,
         "PreToolUse": [

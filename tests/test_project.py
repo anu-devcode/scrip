@@ -44,11 +44,13 @@ def payload(workspace, index=1, **arguments):
 
 def invoke(plan, raw):
     config = plan.record.entry["PreToolUse"][0]["hooks"][0]["command"]
-    launcher = f'cmd.exe /D /S /C "{config}"' if os.name == "nt" else ["/bin/sh", "-c", config]
+    launcher = (
+        ["cmd.exe", "/D", "/S", "/C", config] if os.name == "nt" else ["/bin/sh", "-c", config]
+    )
     result = subprocess.run(
         launcher,
-        input=json.dumps(raw),
-        text=True,
+        input=json.dumps(raw, ensure_ascii=False),
+        encoding="utf-8",
         capture_output=True,
         timeout=15,
     )
@@ -58,7 +60,10 @@ def invoke(plan, raw):
 
 def test_project_hook_runs_without_scrip_on_path(tmp_path, monkeypatch):
     workspace, base, plan = setup(tmp_path)
-    monkeypatch.setenv("PATH", "")
+    windows_shell = os.path.join(
+        os.environ.get("SYSTEMROOT", "C:\\Windows"), "System32", "WindowsPowerShell", "v1.0"
+    )
+    monkeypatch.setenv("PATH", windows_shell if os.name == "nt" else "")
     project.start(workspace, base)
     assert invoke(plan, payload(workspace))["decision"] == "auto_approve"
     assert project.status(workspace, base)["last_hook"] is not None
@@ -73,9 +78,27 @@ def test_frozen_project_hook_quotes_absolute_companion_path(tmp_path, monkeypatc
     plan = project.plan_setup(workspace, tmp_path / "state", [])
     config = plan.record.entry["PreToolUse"][0]["hooks"][0]["command"]
     companion = executable.with_name("scrip-cli.exe" if os.name == "nt" else "scrip-cli")
-    expected = f'"{companion}"' if os.name == "nt" else shlex.quote(str(companion))
-    assert config.startswith(expected + " project-hook ")
+    if os.name == "nt":
+        assert config.startswith("powershell.exe -NoProfile -NonInteractive -EncodedCommand ")
+        assert '"' not in config
+        script = base64.b64decode(config.split()[-1]).decode("utf-16le")
+        assert "& '" + str(companion).replace("'", "''") + "' 'project-hook' " in script
+        assert "[Console]::In.ReadToEnd() | & " in script
+        assert script.endswith("; exit $LASTEXITCODE")
+    else:
+        assert config.startswith(shlex.quote(str(companion)) + " project-hook ")
     assert " -m scrip_core " not in config
+
+
+def test_project_hook_preserves_unicode_json_through_shell(tmp_path):
+    parent = tmp_path / "O'Brien & café 世界"
+    parent.mkdir()
+    workspace, base, plan = setup(parent)
+    project.start(workspace, base, session_mode=True)
+    raw = payload(workspace)
+    raw["conversationId"] = "session-café-世界"
+    assert invoke(plan, raw)["decision"] == "auto_approve"
+    assert project.status(workspace, base)["bound_session"] == raw["conversationId"]
 
 
 def test_preview_and_unconfirmed_apply_have_no_side_effects(tmp_path):
@@ -272,8 +295,13 @@ def test_context_contains_paths_only_as_data(tmp_path):
     workspace.mkdir()
     plan = project.plan_setup(workspace, tmp_path / "state", [COMMAND])
     config = plan.record.entry["PreToolUse"][0]["hooks"][0]["command"]
-    args = shlex.split(config)
-    context = args[args.index("--context") + 1]
+    if os.name == "nt":
+        script = base64.b64decode(config.split()[-1]).decode("utf-16le")
+        context = script.split("'--context' '")[1].split("'")[0]
+        assert str(workspace) not in script
+    else:
+        args = shlex.split(config)
+        context = args[args.index("--context") + 1]
     assert str(workspace) not in config
     assert json.loads(base64.urlsafe_b64decode(context))["workspace"] == str(workspace)
 

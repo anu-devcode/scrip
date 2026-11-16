@@ -5,7 +5,7 @@ terminal. The current installer supports **Windows 10/11 x64**.
 
 ## Install
 
-[Download Scrip Terminal 0.4.2](https://scrip.anwardev.me/downloads/Scrip-Terminal-0.4.2-windows-x64-setup.exe)
+[Download Scrip Terminal 0.4.3](https://scrip.anwardev.me/downloads/Scrip-Terminal-0.4.3-windows-x64-setup.exe)
 
 1. Run the installer and keep **Add Scrip to your user PATH** selected.
 2. Restart your editor so its terminal and agent hooks receive the new PATH.
