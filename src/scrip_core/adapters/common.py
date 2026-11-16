@@ -62,14 +62,17 @@ def hashed_id(prefix: str, identity: str) -> str:
     return prefix + hashlib.sha256(identity.encode("utf-8")).hexdigest()
 
 
-def hook_argv(adapter: str, hook: str, data_dir: Path, mode: HookMode) -> list[str]:
-    launcher = (
+def cli_launcher() -> list[str]:
+    return (
         [str(Path(sys.executable).with_name("scrip-cli.exe" if os.name == "nt" else "scrip-cli"))]
         if getattr(sys, "frozen", False)
         else [sys.executable, "-m", "scrip_core"]
     )
+
+
+def hook_argv(adapter: str, hook: str, data_dir: Path, mode: HookMode) -> list[str]:
     return [
-        *launcher,
+        *cli_launcher(),
         "--data-dir",
         str(data_dir.resolve()),
         "hook",

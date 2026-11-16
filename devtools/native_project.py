@@ -10,7 +10,11 @@ from pathlib import Path
 def check(executable: Path) -> None:
     executable = executable.resolve()
     environment = {key: value for key, value in os.environ.items() if key != "PYTHONPATH"}
-    environment["PATH"] = str(executable.parent) + os.pathsep + environment.get("PATH", "")
+    environment["PATH"] = os.pathsep.join(
+        entry
+        for entry in environment.get("PATH", "").split(os.pathsep)
+        if not (Path(entry) / "scrip.exe").is_file()
+    )
     with tempfile.TemporaryDirectory(prefix="scrip-project-package-") as directory:
         root = Path(directory).resolve()
         workspace, state = root / "O'Brien & project", root / "state"
@@ -42,7 +46,6 @@ def check(executable: Path) -> None:
         def hook(
             index: int,
             command: str,
-            shell: str = "cmd",
             conversation: str = "native-project-check",
             live_shape: bool = False,
         ) -> str:
@@ -63,13 +66,8 @@ def check(executable: Path) -> None:
                 raw["cwd"] = str(workspace)
                 del raw["toolCall"]["args"]["Cwd"]
                 raw["toolCall"]["args"]["toolSummary"] = "Display-only test description"
-            launcher = (
-                ["cmd.exe", "/D", "/S", "/C", generated]
-                if shell == "cmd"
-                else ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", generated]
-            )
             result = subprocess.run(
-                launcher,
+                f'cmd.exe /D /S /C "{generated}"',
                 input=json.dumps(raw),
                 cwd=workspace,
                 env=environment,
@@ -87,7 +85,7 @@ def check(executable: Path) -> None:
         assert hook(2, proposed) == "auto_approve"
         assert hook(2, proposed) == "allow"
         assert hook(3, proposed + "; git push") == "allow"
-        assert hook(4, proposed, "powershell") == "auto_approve"
+        assert hook(4, proposed) == "auto_approve"
         assert cli("stop") == "Scrip stopped.\n"
         assert hook(5, proposed) == "allow"
         assert not json.loads(cli("status", "--project"))["active"]
@@ -102,6 +100,7 @@ def check(executable: Path) -> None:
         assert hook(9, "NEVER_EXECUTE_AFTER_STOP") == "allow"
         assert target.read_bytes() == before
     print(
-        "Bundled project CLI passed: preview, explicit setup, start/stop, exact commands, "
-        "replay, and generated hooks through cmd and PowerShell. No proposed command executed."
+        "Bundled project CLI with Scrip absent from PATH passed: preview, explicit setup, "
+        "start/stop, exact commands, replay, and generated hooks through Command Prompt. "
+        "No proposed command executed."
     )

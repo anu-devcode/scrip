@@ -7,6 +7,8 @@ import base64
 import hashlib
 import json
 import os
+import shlex
+import subprocess
 import sys
 from contextlib import suppress
 from dataclasses import dataclass
@@ -17,7 +19,7 @@ from uuid import uuid4
 from pydantic import Field
 
 from .adapters import antigravity
-from .adapters.common import JsonObject
+from .adapters.common import JsonObject, cli_launcher
 from .authorization import ProjectAuthorization, SessionCommandScope
 from .bootstrap import create_service
 from .connections import atomic_settings
@@ -100,8 +102,21 @@ def plan_setup(workspace: Path, base: Path, commands: list[str]) -> SetupPlan:
             }
         ).encode()
     ).decode()
-    # Bare executable + ASCII-only arguments avoids shell parsing of paths on Windows.
-    # The installer puts scrip.exe on PATH; no absolute path is embedded in shell code.
+    # Resolve the actual runtime at setup time so an existing host process can
+    # invoke this hook even when it inherited PATH before Scrip was installed.
+    arguments = [
+        *cli_launcher(),
+        "project-hook",
+        "--context",
+        context,
+        "--installation-id",
+        installation,
+    ]
+    command_line = (
+        f'"{arguments[0]}" {subprocess.list2cmdline(arguments[1:])}'
+        if os.name == "nt"
+        else shlex.join(arguments)
+    )
     entry = {
         "enabled": True,
         "PreToolUse": [
@@ -111,10 +126,7 @@ def plan_setup(workspace: Path, base: Path, commands: list[str]) -> SetupPlan:
                     {
                         "type": "command",
                         "timeout": 5,
-                        "command": (
-                            f"scrip project-hook --context {context} "
-                            f"--installation-id {installation}"
-                        ),
+                        "command": command_line,
                     }
                 ],
             }

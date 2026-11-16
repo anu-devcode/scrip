@@ -1,11 +1,14 @@
 # Antigravity project commands
 
-The v0.4.0 Scrip Terminal Windows build includes a bundled `scrip.exe` console command
+The v0.4.2 Scrip Terminal Windows build includes a bundled `scrip.exe` console command
 and its Python runtime. It does not require Qt, system Python, or the Scrip desktop app.
 It installs separately under `%LOCALAPPDATA%/Programs/ScripTerminal`. Use the Scrip Terminal installer from https://scrip.anwardev.me for these commands.
 Older desktop installers do not include this workflow.
-The installer offers adding Scrip to the current user's PATH. Restart the terminal's parent
-application once after installation so both the terminal and agent hooks inherit the new PATH.
+The installer offers adding Scrip to the current user's PATH for terminal commands. The
+project hook resolves Scrip's runtime directly during setup, so it can start even when the
+agent host inherited an older PATH. After updating from 0.4.1 or earlier, run
+`scrip setup --apply` again, then `scrip start` to replace the earlier PATH-dependent hook.
+Begin a new agent turn to load the updated hook.
 
 ## One-time reviewed setup
 
@@ -23,7 +26,7 @@ scrip setup --apply
 
 Only explicit setup writes the named `scrip-project-commands` hook. Other hooks are
 preserved, existing contents are backed up, and changed or unowned entries are refused.
-Setup leaves approvals stopped. Already-configured v0.3.x projects need no hook rewrite.
+Setup leaves approvals stopped. Reapplying setup updates the owned Scrip hook and backs up the previous contents.
 
 ## Daily use
 
@@ -60,12 +63,17 @@ duplicate approvals delegate to native host policy. Invalid input or a hook erro
 native review. This new project hook does not force every unknown command to prompt over
 your existing native grants.
 
-The screenshot's Turbo setting normally permits shell commands, but explicit rules override
-the preset. A separate hook returning `force_ask` can also request review. If the command still
-prompts, review the project's Ask rules and enabled hooks in Antigravity's own settings. Scrip
-does not remove those rules, disable other hooks, or patch application files. An already-open
-approval prompt needs a response in the host; begin a new agent turn to load the new hook.
-Structured questions remain in Antigravity and are never answered by this command hook.
+An already-open approval prompt needs a response in the host. Begin a new agent turn after
+setup, then use `scrip status --project` to check delivery. `configured` and `active` report
+Scrip's local setup and authorization. `last_hook` records an actual callback, including its
+stage and response. If it remains `null` after a new shell-command request, delivery has not
+been observed. Confirm that Antigravity opened the same project root and check the app's
+version against its documented hook support. Use the callback record to verify delivery even
+when the hook-management screen is absent.
+
+If a callback reports `auto_approve` but the command still prompts, inspect explicit Ask/Deny
+rules and other enabled hooks in the host. A hook returning `force_ask` can request review.
+Structured questions still need your answer.
 
 ## Scope and verification
 
@@ -91,8 +99,9 @@ uv sync --locked --extra dev --extra build
 uv run python -m devtools.build_terminal --compiler PATH_TO_ISCC.exe
 ```
 
-The build runs the actual bundled console and generated hooks through Command Prompt and
-PowerShell in a temporary project before compiling the installer. It never executes the
+The build runs the actual bundled console and generated hooks through Windows Command Prompt,
+the documented hook shell, with Scrip removed from PATH in a temporary project before compiling
+the installer. Release CI also installs into a path containing spaces. It never executes the
 proposed agent command. The separate desktop bundle has its own Qt validation gate; passing
 terminal checks does not establish that the desktop package works.
 

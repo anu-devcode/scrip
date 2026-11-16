@@ -10,6 +10,7 @@ import sys
 import pytest
 
 from scrip_core import cli, project
+from scrip_core.adapters import common
 from scrip_core.bootstrap import create_service
 
 COMMAND = 'git grep -n "staffPortalRoutes"'
@@ -41,11 +42,11 @@ def payload(workspace, index=1, **arguments):
     }
 
 
-def invoke(plan, raw, *, command=None):
+def invoke(plan, raw):
     config = plan.record.entry["PreToolUse"][0]["hooks"][0]["command"]
-    args = shlex.split(config)[1:]
+    launcher = f'cmd.exe /D /S /C "{config}"' if os.name == "nt" else ["/bin/sh", "-c", config]
     result = subprocess.run(
-        command or [sys.executable, "-m", "scrip_core", *args],
+        launcher,
         input=json.dumps(raw),
         text=True,
         capture_output=True,
@@ -53,6 +54,28 @@ def invoke(plan, raw, *, command=None):
     )
     assert result.returncode == 0, result.stderr
     return json.loads(result.stdout)
+
+
+def test_project_hook_runs_without_scrip_on_path(tmp_path, monkeypatch):
+    workspace, base, plan = setup(tmp_path)
+    monkeypatch.setenv("PATH", "")
+    project.start(workspace, base)
+    assert invoke(plan, payload(workspace))["decision"] == "auto_approve"
+    assert project.status(workspace, base)["last_hook"] is not None
+
+
+def test_frozen_project_hook_quotes_absolute_companion_path(tmp_path, monkeypatch):
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    executable = tmp_path / "Scrip's runtime & tools" / "scrip.exe"
+    monkeypatch.setattr(common.sys, "executable", str(executable))
+    monkeypatch.setattr(common.sys, "frozen", True, raising=False)
+    plan = project.plan_setup(workspace, tmp_path / "state", [])
+    config = plan.record.entry["PreToolUse"][0]["hooks"][0]["command"]
+    companion = executable.with_name("scrip-cli.exe" if os.name == "nt" else "scrip-cli")
+    expected = f'"{companion}"' if os.name == "nt" else shlex.quote(str(companion))
+    assert config.startswith(expected + " project-hook ")
+    assert " -m scrip_core " not in config
 
 
 def test_preview_and_unconfirmed_apply_have_no_side_effects(tmp_path):
